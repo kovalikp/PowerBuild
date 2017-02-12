@@ -12,7 +12,6 @@ namespace PowerBuild.Tests
         [Fact]
         public async Task ProcessRecordCrossDomainTest()
         {
-            var cmdletHelper = new CmdletHelper();
             Directory.GetCurrentDirectory();
 
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
@@ -35,8 +34,6 @@ namespace PowerBuild.Tests
         [Fact]
         public async Task ProcessRecordTest()
         {
-            var cmdletHelper = new CmdletHelper();
-
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
 
             var helper = new MSBuildHelper

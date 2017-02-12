@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyResources.cs" />
-    <Compile Include="CmdletHelper.cs" />
     <Compile Include="CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="InvokeMSBuild.cs" />
