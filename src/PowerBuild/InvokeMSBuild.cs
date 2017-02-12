@@ -70,32 +70,42 @@ namespace PowerBuild
             _msBuildHelper.ToolVersion = ToolVersion;
             _msBuildHelper.Target = Target;
             _msBuildHelper.CmdletHelper = cmdletHelper;
+
+            var powerShellLogger = new PowerShellLogger(Verbosity, this);
             _msBuildHelper.Loggers = new ILogger[]
             {
-                new CrossDomainLogger(new PowerShellLogger(Verbosity, cmdletHelper, Host.UI.RawUI.ForegroundColor))
+                //new CrossDomainLogger(new PowerShellHostLogger(Verbosity, this)),
+                new CrossDomainLogger(powerShellLogger)
             };
+
+            //_msBuildHelper.Loggers = new ILogger[]
+            //{
+            //    new CrossDomainLogger(new PowerShellLogger(Verbosity, cmdletHelper, Host.UI.RawUI.ForegroundColor))
+            //};
 
             var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
 
-            foreach (var messageContainer in cmdletHelper.ConsumeBuildEvents())
-            {
-                if (messageContainer.BuildEvent is BuildErrorEventArgs)
-                {
-                    WriteError(
-                        new ErrorRecord(new Exception(messageContainer.FormattedMessage), 
-                        ((BuildErrorEventArgs)messageContainer.BuildEvent).Code,
-                        ErrorCategory.NotSpecified, 
-                        messageContainer.BuildEvent));
-                }
-                else if (messageContainer.BuildEvent is BuildWarningEventArgs)
-                {
-                    WriteWarning(messageContainer.FormattedMessage);
-                }
-                else
-                {
-                    Host.UI.Write(messageContainer.Color, Host.UI.RawUI.BackgroundColor, messageContainer.FormattedMessage);
-                }
-            }
+            powerShellLogger.ConsumeEvents();
+
+            //foreach (var messageContainer in cmdletHelper.ConsumeBuildEvents())
+            //{
+            //    if (messageContainer.BuildEvent is BuildErrorEventArgs)
+            //    {
+            //        WriteError(
+            //            new ErrorRecord(new Exception(messageContainer.FormattedMessage), 
+            //            ((BuildErrorEventArgs)messageContainer.BuildEvent).Code,
+            //            ErrorCategory.NotSpecified, 
+            //            messageContainer.BuildEvent));
+            //    }
+            //    else if (messageContainer.BuildEvent is BuildWarningEventArgs)
+            //    {
+            //        WriteWarning(messageContainer.FormattedMessage);
+            //    }
+            //    else
+            //    {
+            //        Host.UI.Write(messageContainer.Color, Host.UI.RawUI.BackgroundColor, messageContainer.FormattedMessage);
+            //    }
+            //}
 
             var results = _msBuildHelper.EndProcessRecord(asyncResult);
 

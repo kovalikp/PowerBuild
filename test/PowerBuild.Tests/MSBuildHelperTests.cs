@@ -45,11 +45,7 @@ namespace PowerBuild.Tests
                 CmdletHelper = cmdletHelper,
                 Project = new[] { project },
                 Target = new[] { "Build" },
-                ToolVersion = "14.0",
-                Loggers = new ILogger[]
-                {
-                    new CrossDomainLogger(new PowerShellLogger(LoggerVerbosity.Normal, cmdletHelper, ConsoleColor.Gray))
-                }
+                ToolVersion = "14.0"
             };
 
             helper.BeginProcessing();
