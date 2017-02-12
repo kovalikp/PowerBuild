@@ -27,9 +27,13 @@ namespace PowerBuild
 
         public string[] Target { get; set; }
 
-        public string ToolVersion { get; set; }
+        public string ToolsVersion { get; set; }
+
+        public int MaxCpuCount { get; set; }
 
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
+
+        public bool NodeReuse { get; set; }
 
         public static MSBuildHelper CreateCrossDomain(string configurationFile, out AppDomain appDomain)
         {
@@ -64,7 +68,11 @@ namespace PowerBuild
             {
                 var parameters = new BuildParameters
                 {
-                    Loggers = Loggers
+                    Loggers = Loggers,
+                    MaxNodeCount = MaxCpuCount,
+                    DefaultToolsVersion = ToolsVersion,
+                    EnableNodeReuse = NodeReuse,
+
                 };
 
                 foreach (var project in Project)
@@ -75,7 +83,7 @@ namespace PowerBuild
                         IDictionary<string, string> globalProperties = new Dictionary<string, string>();
                         var targetsToBuild = Target ?? new string[0];
 
-                        var requestData = new BuildRequestData(project, globalProperties, ToolVersion, targetsToBuild, null);
+                        var requestData = new BuildRequestData(project, globalProperties, ToolsVersion, targetsToBuild, null);
                         var submission = _buildManager.PendBuildRequest(requestData);
 
                         var buildResult = await submission.ExecuteAsync();

@@ -20,6 +20,22 @@
             _consoleLogger = new ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
         }
 
+        public bool? ShowSummary
+        {
+            get
+            {
+                return _consoleLogger.ShowSummary;
+            }
+
+            set
+            {
+                if (value != null)
+                {
+                    _consoleLogger.ShowSummary = value.Value;
+                }
+            }
+        }
+
         public override void Initialize(IEventSource eventSource)
         {
             _buildEvents = new BlockingCollection<Action<Cmdlet>>();

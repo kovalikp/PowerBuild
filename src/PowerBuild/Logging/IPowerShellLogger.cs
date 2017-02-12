@@ -5,5 +5,7 @@
     public interface IPowerShellLogger : ILogger
     {
         void WriteEvents();
+
+        bool? ShowSummary { get; set; }
     }
 }

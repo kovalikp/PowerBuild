@@ -17,10 +17,20 @@
         private MSBuildHelper _msBuildHelper;
 
         [Parameter]
+        [Alias("dl")]
         public DefaultLoggerType DefaultLogger { get; set; } = DefaultLoggerType.Streams;
 
+        [Parameter]
+        [Alias("dlp")]
+        public string DefaultLoggerParameters { get; set; }
+
+        [Parameter]
+        [AllowNull]
+        [Alias("m")]
+        public int? MaxCpuCount { get; set; } = 1;
+
         [Parameter(
-                    Position = 0,
+            Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true,
@@ -32,14 +42,25 @@
             Position = 1,
             Mandatory = false,
             HelpMessage = "Target to build.")]
+        [Alias("t")]
         public string[] Target { get; set; }
 
         [Parameter]
         [ValidateSet("4.0", "12.0", "14.0")]
-        public string ToolVersion { get; set; }
+        [Alias("tv")]
+        public string ToolsVersion { get; set; }
 
         [Parameter]
+        [Alias("v")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
+
+        [Parameter]
+        [Alias("nr")]
+        public bool NodeReuse { get; set; }
+
+        [Parameter]
+        [Alias("ds")]
+        public bool? DetailedSummary { get; set; }
 
         protected override void BeginProcessing()
         {
@@ -70,8 +91,10 @@
             WriteDebug("Process record");
             _msBuildHelper.Project = Project;
             _msBuildHelper.Verbosity = Verbosity;
-            _msBuildHelper.ToolVersion = ToolVersion;
+            _msBuildHelper.ToolsVersion = ToolsVersion;
             _msBuildHelper.Target = Target;
+            _msBuildHelper.MaxCpuCount = MaxCpuCount ?? Environment.ProcessorCount;
+            _msBuildHelper.NodeReuse = NodeReuse;
 
             var loggers = new List<ILogger>();
             IPowerShellLogger powerShellLogger;
@@ -79,12 +102,10 @@
             {
                 case DefaultLoggerType.Streams:
                     powerShellLogger = new StreamsLogger(Verbosity, this);
-                    loggers.Add(powerShellLogger);
                     break;
 
                 case DefaultLoggerType.Host:
                     powerShellLogger = new HostLogger(Verbosity, this);
-                    loggers.Add(powerShellLogger);
                     break;
 
                 case DefaultLoggerType.None:
@@ -93,6 +114,13 @@
 
                 default:
                     throw new InvalidEnumArgumentException();
+            }
+
+            if (powerShellLogger != null)
+            {
+                loggers.Add(powerShellLogger);
+                powerShellLogger.ShowSummary = DetailedSummary;
+                powerShellLogger.Parameters = DefaultLoggerParameters;
             }
 
             _msBuildHelper.Loggers = new ILogger[]

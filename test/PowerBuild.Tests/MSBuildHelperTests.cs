@@ -21,7 +21,7 @@ namespace PowerBuild.Tests
 
             helper.Project = new[] { project };
             helper.Target = new[] { "Build" };
-            helper.ToolVersion = "14.0";
+            helper.ToolsVersion = "14.0";
 
             helper.BeginProcessing();
 
@@ -40,7 +40,7 @@ namespace PowerBuild.Tests
             {
                 Project = new[] { project },
                 Target = new[] { "Build" },
-                ToolVersion = "14.0"
+                ToolsVersion = "14.0"
             };
 
             helper.BeginProcessing();
