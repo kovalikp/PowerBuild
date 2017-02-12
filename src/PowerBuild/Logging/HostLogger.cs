@@ -1,19 +1,20 @@
-﻿namespace PowerBuild
+﻿namespace PowerBuild.Logging
 {
     using System;
 
     using System.Management.Automation;
+    using Logging;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
 
-    public class PowerShellHostLogger : INodeLogger
+    public class HostLogger : IPowerShellLogger, INodeLogger
     {
         private readonly PSCmdlet _cmdlet;
-        private ConsoleLogger _consoleLogger;
-        private ConsoleColor _defaultForegroundColor;
+        private readonly ConsoleLogger _consoleLogger;
+        private readonly ConsoleColor _defaultForegroundColor;
         private ConsoleColor _foregroundColor;
 
-        public PowerShellHostLogger(LoggerVerbosity verbosity, PSCmdlet cmdlet)
+        public HostLogger(LoggerVerbosity verbosity, PSCmdlet cmdlet)
         {
             _cmdlet = cmdlet;
             _defaultForegroundColor = cmdlet.Host.UI.RawUI.ForegroundColor;
@@ -45,6 +46,10 @@
         public void Shutdown()
         {
             _consoleLogger.Shutdown();
+        }
+
+        public void WriteEvents()
+        {
         }
 
         private void ColorReset()

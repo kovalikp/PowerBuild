@@ -1,11 +1,13 @@
-﻿using System;
-using System.Management.Automation;
-using System.Reflection;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Logging;
-
-namespace PowerBuild
+﻿namespace PowerBuild
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Management.Automation;
+    using System.Reflection;
+    using Logging;
+    using Microsoft.Build.Framework;
+
     [OutputType(typeof(MSBuildResult))]
     [Cmdlet("Invoke", "MSBuild")]
     public class InvokeMSBuild : PSCmdlet
@@ -14,8 +16,11 @@ namespace PowerBuild
 
         private MSBuildHelper _msBuildHelper;
 
+        [Parameter]
+        public DefaultLoggerType DefaultLogger { get; set; } = DefaultLoggerType.Streams;
+
         [Parameter(
-            Position = 0,
+                    Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true,
@@ -38,7 +43,6 @@ namespace PowerBuild
 
         protected override void BeginProcessing()
         {
-
             WriteDebug("Begin processing");
             base.BeginProcessing();
             var configurationPath = Assembly.GetExecutingAssembly().Location + ".config";
@@ -64,52 +68,49 @@ namespace PowerBuild
         protected override void ProcessRecord()
         {
             WriteDebug("Process record");
-            var cmdletHelper = new CmdletHelper();
             _msBuildHelper.Project = Project;
             _msBuildHelper.Verbosity = Verbosity;
             _msBuildHelper.ToolVersion = ToolVersion;
             _msBuildHelper.Target = Target;
-            _msBuildHelper.CmdletHelper = cmdletHelper;
 
-            var powerShellLogger = new PowerShellLogger(Verbosity, this);
+            var loggers = new List<ILogger>();
+            IPowerShellLogger powerShellLogger;
+            switch (DefaultLogger)
+            {
+                case DefaultLoggerType.Streams:
+                    powerShellLogger = new StreamsLogger(Verbosity, this);
+                    loggers.Add(powerShellLogger);
+                    break;
+
+                case DefaultLoggerType.Host:
+                    powerShellLogger = new HostLogger(Verbosity, this);
+                    loggers.Add(powerShellLogger);
+                    break;
+
+                case DefaultLoggerType.None:
+                    powerShellLogger = null;
+                    break;
+
+                default:
+                    throw new InvalidEnumArgumentException();
+            }
+
             _msBuildHelper.Loggers = new ILogger[]
             {
-                //new CrossDomainLogger(new PowerShellHostLogger(Verbosity, this)),
-                new CrossDomainLogger(powerShellLogger)
+                new CrossDomainLogger(loggers)
             };
 
-            //_msBuildHelper.Loggers = new ILogger[]
-            //{
-            //    new CrossDomainLogger(new PowerShellLogger(Verbosity, cmdletHelper, Host.UI.RawUI.ForegroundColor))
-            //};
-
-            var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
-
-            powerShellLogger.ConsumeEvents();
-
-            //foreach (var messageContainer in cmdletHelper.ConsumeBuildEvents())
-            //{
-            //    if (messageContainer.BuildEvent is BuildErrorEventArgs)
-            //    {
-            //        WriteError(
-            //            new ErrorRecord(new Exception(messageContainer.FormattedMessage), 
-            //            ((BuildErrorEventArgs)messageContainer.BuildEvent).Code,
-            //            ErrorCategory.NotSpecified, 
-            //            messageContainer.BuildEvent));
-            //    }
-            //    else if (messageContainer.BuildEvent is BuildWarningEventArgs)
-            //    {
-            //        WriteWarning(messageContainer.FormattedMessage);
-            //    }
-            //    else
-            //    {
-            //        Host.UI.Write(messageContainer.Color, Host.UI.RawUI.BackgroundColor, messageContainer.FormattedMessage);
-            //    }
-            //}
-
-            var results = _msBuildHelper.EndProcessRecord(asyncResult);
-
-            WriteObject(results, true);
+            try
+            {
+                var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
+                powerShellLogger?.WriteEvents();
+                var results = _msBuildHelper.EndProcessRecord(asyncResult);
+                WriteObject(results, true);
+            }
+            catch (Exception ex)
+            {
+                WriteError(new ErrorRecord(ex, "ProcessRecordError", ErrorCategory.NotSpecified, null));
+            }
         }
 
         protected override void StopProcessing()

@@ -20,7 +20,6 @@ namespace PowerBuild.Tests
             AppDomain appDomain;
             var helper = MSBuildHelper.CreateCrossDomain(configurationPath, out appDomain);
 
-            helper.CmdletHelper = cmdletHelper;
             helper.Project = new[] { project };
             helper.Target = new[] { "Build" };
             helper.ToolVersion = "14.0";
@@ -42,7 +41,6 @@ namespace PowerBuild.Tests
 
             var helper = new MSBuildHelper
             {
-                CmdletHelper = cmdletHelper,
                 Project = new[] { project },
                 Target = new[] { "Build" },
                 ToolVersion = "14.0"

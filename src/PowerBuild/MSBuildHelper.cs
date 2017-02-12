@@ -21,8 +21,6 @@ namespace PowerBuild
             _buildManager = new BuildManager();
         }
 
-        public CmdletHelper CmdletHelper { get; set; }
-
         public IEnumerable<ILogger> Loggers { get; set; } = Enumerable.Empty<ILogger>();
 
         public string[] Project { get; set; }
@@ -92,15 +90,12 @@ namespace PowerBuild
             }
             catch (OperationCanceledException)
             {
-                CmdletHelper.SetCanceled();
             }
             catch (Exception ex)
             {
-                CmdletHelper.SetFaulted(ex);
             }
             finally
             {
-                CmdletHelper.SetCompleted();
             }
 
             return results.ToArray();
