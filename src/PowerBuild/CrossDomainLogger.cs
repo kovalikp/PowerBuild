@@ -11,7 +11,7 @@ namespace PowerBuild
     {
         private readonly IEnumerable<ILogger> _loggers;
         private IEventSource _eventSource;
-        private int _nodeCount;
+        private int _nodeCount = -1;
 
         public CrossDomainLogger(IEnumerable<ILogger> loggers)
         {
@@ -57,6 +57,12 @@ namespace PowerBuild
 
         public void Initialize(IEventSource eventSource)
         {
+            Initialize(eventSource, 1);
+        }
+
+        public void Initialize(IEventSource eventSource, int nodeCount)
+        {
+            _nodeCount = nodeCount;
             _eventSource = eventSource;
             _eventSource.MessageRaised += EventSourceOnMessageRaised;
             _eventSource.ErrorRaised += EventSourceOnErrorRaised;
@@ -72,16 +78,19 @@ namespace PowerBuild
             _eventSource.CustomEventRaised += EventSourceOnCustomEventRaised;
             _eventSource.StatusEventRaised += EventSourceOnStatusEventRaised;
             _eventSource.AnyEventRaised += EventSourceOnAnyEventRaised;
+
             foreach (var logger in _loggers)
             {
-                logger.Initialize(this);
+                var nodeLogger = _nodeCount > 1 ? logger as INodeLogger : null;
+                if (nodeLogger == null)
+                {
+                    logger.Initialize(this);
+                }
+                else
+                {
+                    nodeLogger.Initialize(this, _nodeCount);
+                }
             }
-        }
-
-        public void Initialize(IEventSource eventSource, int nodeCount)
-        {
-            _nodeCount = nodeCount;
-            Initialize(eventSource);
         }
 
         public void Shutdown()
