@@ -1,9 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Build.Framework;
+﻿// Copyright (c) 2017 Pavol Kovalik. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace PowerBuild
 {
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.Build.Framework;
+
     internal class CrossDomainLogger : MarshalByRefObject, INodeLogger, IEventSource
     {
         private readonly IEnumerable<ILogger> _loggers;

@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerBuild", "src\PowerBuil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerBuild.Tests", "test\PowerBuild.Tests\PowerBuild.Tests.csproj", "{E43053FC-1A8D-4FAA-A299-13B1AD2D4808}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8CBBB8E1-4D9D-457B-8C87-28364ACD98AA}"
+	ProjectSection(SolutionItems) = preProject
+		src\PowerBuild.props = src\PowerBuild.props
+		src\PowerBuild.ruleset = src\PowerBuild.ruleset
+		src\stylecop.json = src\stylecop.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

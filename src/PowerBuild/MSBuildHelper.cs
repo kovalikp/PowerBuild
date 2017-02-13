@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
+﻿// Copyright (c) 2017 Pavol Kovalik. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace PowerBuild
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Build.Execution;
+    using Microsoft.Build.Framework;
+
     public class MSBuildHelper : MarshalByRefObject
     {
         private BuildManager _buildManager;
@@ -72,7 +75,6 @@ namespace PowerBuild
                     MaxNodeCount = MaxCpuCount,
                     DefaultToolsVersion = ToolsVersion,
                     EnableNodeReuse = NodeReuse,
-
                 };
 
                 foreach (var project in Project)
@@ -97,12 +99,6 @@ namespace PowerBuild
                 }
             }
             catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
             {
             }
 

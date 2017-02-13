@@ -1,9 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// Copyright (c) 2017 Pavol Kovalik. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace PowerBuild
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     internal class TaskAsyncResult : MarshalByRefObject, IAsyncResult
     {
         private readonly Task _task;
