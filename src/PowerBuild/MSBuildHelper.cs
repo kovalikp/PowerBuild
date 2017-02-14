@@ -74,7 +74,7 @@ namespace PowerBuild
                     Loggers = Loggers,
                     MaxNodeCount = MaxCpuCount,
                     DefaultToolsVersion = ToolsVersion,
-                    EnableNodeReuse = NodeReuse,
+                    EnableNodeReuse = NodeReuse
                 };
 
                 foreach (var project in Project)

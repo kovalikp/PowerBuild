@@ -65,6 +65,10 @@ namespace PowerBuild
         [Alias("ds")]
         public bool? DetailedSummary { get; set; }
 
+        [Parameter]
+        [Alias("l")]
+        public ILogger[] Logger { get; set; }
+
         protected override void BeginProcessing()
         {
             WriteDebug("Begin processing");
@@ -124,6 +128,11 @@ namespace PowerBuild
                 loggers.Add(powerShellLogger);
                 powerShellLogger.ShowSummary = DetailedSummary;
                 powerShellLogger.Parameters = DefaultLoggerParameters;
+            }
+
+            if (Logger != null)
+            {
+                loggers.AddRange(Logger);
             }
 
             _msBuildHelper.Loggers = new ILogger[]
