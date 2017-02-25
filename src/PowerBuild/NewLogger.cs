@@ -13,16 +13,16 @@ namespace PowerBuild
     [Cmdlet(VerbsCommon.New, "Logger")]
     public class NewLogger : PSCmdlet
     {
-        [Parameter(Position = 0)]
+        [Parameter(Position = 0, HelpMessage = "Logger assembly name or file path.")]
         public string Assembly { get; set; }
 
-        [Parameter(Position = 1)]
+        [Parameter(Position = 1, HelpMessage = "Logger class name. Can contain partial or full namespace.")]
         public string ClassName { get; set; }
 
-        [Parameter(Position = 3)]
+        [Parameter(Position = 2, HelpMessage = "Parameters passed to logger.")]
         public string Parameters { get; set; }
 
-        [Parameter(Position = 2)]
+        [Parameter(Position = 3, HelpMessage = "Overrides the Verbosity setting for this logger. Default verbosity is Normal.")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
         protected override void ProcessRecord()
