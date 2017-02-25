@@ -5,6 +5,7 @@ namespace PowerBuild
 {
     using System;
     using System.IO;
+    using System.Management.Automation.Host;
     using System.Reflection;
     using System.Threading;
     using Microsoft.Build.Framework;
@@ -16,7 +17,9 @@ namespace PowerBuild
         private static Lazy<Factory> _instance = new Lazy<Factory>(CreateInvokeFactory, LazyThreadSafetyMode.ExecutionAndPublication);
         private static Lazy<AppDomain> _invokeAppDomain = new Lazy<AppDomain>(CreateInvokeAppDomain, LazyThreadSafetyMode.ExecutionAndPublication);
 
-        public static Factory Instance => _instance.Value;
+        public static Factory InvokeInstance => _instance.Value;
+
+        public static Factory PowerShellInstance { get; } = new Factory();
 
         public ILogger CreateFileLogger(FileLoggerParameters fileLoggerParameters)
         {
@@ -78,6 +81,14 @@ namespace PowerBuild
             }
 
             return new InvokeDomainLogger(logger);
+        }
+
+        public ILogger CreateConsoleLogger(ConsoleLoggerParameters consoleLoggerParameters, PSHost host)
+        {
+            var verbosity = consoleLoggerParameters.Verbosity ?? LoggerVerbosity.Normal;
+            var consoleLogger = new Logging.ConsoleLogger(verbosity, host);
+            consoleLogger.Parameters = consoleLoggerParameters.ToString();
+            return consoleLogger;
         }
     }
 }

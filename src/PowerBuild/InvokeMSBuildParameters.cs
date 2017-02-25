@@ -7,7 +7,7 @@ namespace PowerBuild
     using Microsoft.Build.Framework;
 
     [Serializable]
-    public class InvokeMSBuildParameters
+    internal class InvokeMSBuildParameters
     {
         public bool DetailedSummary { get; set; }
 

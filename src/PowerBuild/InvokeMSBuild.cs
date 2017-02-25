@@ -73,7 +73,7 @@ namespace PowerBuild
         {
             WriteDebug("Begin processing");
             base.BeginProcessing();
-            _msBuildHelper = Factory.Instance.CreateMSBuildHelper();
+            _msBuildHelper = Factory.InvokeInstance.CreateMSBuildHelper();
             _msBuildHelper.BeginProcessing();
         }
 
@@ -108,7 +108,7 @@ namespace PowerBuild
                     break;
 
                 case DefaultLoggerType.Host:
-                    powerShellLogger = new HostLogger(Verbosity, this);
+                    powerShellLogger = new ConsoleLogger(Verbosity, Host);
                     break;
 
                 case DefaultLoggerType.None:

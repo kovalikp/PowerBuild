@@ -8,12 +8,9 @@ namespace PowerBuild
     using Microsoft.Build.Framework;
 
     [OutputType(typeof(ILogger))]
-    [Cmdlet(VerbsCommon.New, "FileLogger")]
-    public class NewFileLogger : PSCmdlet
+    [Cmdlet(VerbsCommon.New, "ConsoleLogger")]
+    public class NewConsoleLogger : PSCmdlet
     {
-        [Parameter]
-        public SwitchParameter Append { get; set; }
-
         [Parameter]
         public SwitchParameter DisableConsoleColor { get; set; }
 
@@ -24,9 +21,6 @@ namespace PowerBuild
         public SwitchParameter EnableMPLogging { get; set; }
 
         [Parameter]
-        public string Encoding { get; set; }
-
-        [Parameter]
         public SwitchParameter ErrorsOnly { get; set; }
 
         [Parameter]
@@ -34,9 +28,6 @@ namespace PowerBuild
 
         [Parameter]
         public SwitchParameter ForceNoAlign { get; set; }
-
-        [Parameter(Position = 1, Mandatory = true)]
-        public string LogFile { get; set; }
 
         [Parameter]
         public SwitchParameter NoItemAndPropertyList { get; set; }
@@ -59,7 +50,7 @@ namespace PowerBuild
         [Parameter]
         public SwitchParameter Summary { get; set; }
 
-        [Parameter(Position = 2)]
+        [Parameter(Position = 0)]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
         [Parameter]
@@ -69,19 +60,16 @@ namespace PowerBuild
         {
             base.ProcessRecord();
 
-            var loggerParameters = new FileLoggerParameters()
+            var loggerParameters = new ConsoleLoggerParameters()
             {
                 Verbosity = Verbosity,
                 PerformanceSummary = PerformanceSummary,
-                Append = Append,
                 DisableConsoleColor = DisableConsoleColor,
                 DisableMPLogging = DisableMPLogging,
                 EnableMPLogging = EnableMPLogging,
-                Encoding = Encoding,
                 ErrorsOnly = ErrorsOnly,
                 ForceConsoleColor = ForceConsoleColor,
                 ForceNoAlign = ForceNoAlign,
-                LogFile = LogFile,
                 NoItemAndPropertyList = NoItemAndPropertyList,
                 NoSummary = NoSummary,
                 ShowCommandLine = ShowCommandLine,
@@ -91,7 +79,7 @@ namespace PowerBuild
                 WarningsOnly = WarningsOnly
             };
 
-            var logger = Factory.InvokeInstance.CreateFileLogger(loggerParameters);
+            var logger = Factory.PowerShellInstance.CreateConsoleLogger(loggerParameters, Host);
 
             WriteObject(logger);
         }

@@ -37,7 +37,7 @@ namespace PowerBuild
                 Verbosity = Verbosity
             };
 
-            var logger = Factory.Instance.CreateLogger(loggerParameters);
+            var logger = Factory.InvokeInstance.CreateLogger(loggerParameters);
 
             WriteObject(logger);
         }

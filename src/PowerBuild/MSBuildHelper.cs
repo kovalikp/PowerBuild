@@ -11,7 +11,7 @@ namespace PowerBuild
     using Microsoft.Build.Execution;
     using Microsoft.Build.Framework;
 
-    public class MSBuildHelper : MarshalByRefObject
+    internal class MSBuildHelper : MarshalByRefObject
     {
         private BuildManager _buildManager;
 

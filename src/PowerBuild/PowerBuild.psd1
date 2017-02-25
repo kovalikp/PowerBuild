@@ -73,8 +73,9 @@ FormatsToProcess = @(
 # Cmdlets to export from this module
 CmdletsToExport = @(
 	'Invoke-MSBuild',
-	'New-Logger',
-	'New-FileLogger'
+	'New-ConsoleLogger',
+	'New-FileLogger',
+	'New-Logger'
 )
 
 

@@ -13,14 +13,14 @@ namespace PowerBuild.Logging
     internal class StreamsLogger : Logger, IPowerShellLogger
     {
         private readonly Cmdlet _cmdlet;
-        private readonly ConsoleLogger _consoleLogger;
+        private readonly Microsoft.Build.Logging.ConsoleLogger _consoleLogger;
         private BlockingCollection<Action<Cmdlet>> _buildEvents = new BlockingCollection<Action<Cmdlet>>();
         private IEventSource _eventSource;
 
         public StreamsLogger(LoggerVerbosity verbosity, Cmdlet cmdlet)
         {
             _cmdlet = cmdlet;
-            _consoleLogger = new ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
+            _consoleLogger = new Microsoft.Build.Logging.ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
         }
 
         public override void Initialize(IEventSource eventSource)

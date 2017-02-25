@@ -6,21 +6,21 @@ namespace PowerBuild.Logging
     using System;
 
     using System.Management.Automation;
+    using System.Management.Automation.Host;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Logging;
 
-    public class HostLogger : IPowerShellLogger, INodeLogger
+    public class ConsoleLogger : IPowerShellLogger, INodeLogger
     {
-        private readonly PSCmdlet _cmdlet;
-        private readonly ConsoleLogger _consoleLogger;
+        private readonly PSHost _host;
+        private readonly Microsoft.Build.Logging.ConsoleLogger _consoleLogger;
         private readonly ConsoleColor _defaultForegroundColor;
         private ConsoleColor _foregroundColor;
 
-        public HostLogger(LoggerVerbosity verbosity, PSCmdlet cmdlet)
+        public ConsoleLogger(LoggerVerbosity verbosity, PSHost host)
         {
-            _cmdlet = cmdlet;
-            _defaultForegroundColor = cmdlet.Host.UI.RawUI.ForegroundColor;
-            _consoleLogger = new ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
+            _host = host;
+            _defaultForegroundColor = host.UI.RawUI.ForegroundColor;
+            _consoleLogger = new Microsoft.Build.Logging.ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
         }
 
         public string Parameters
@@ -66,7 +66,7 @@ namespace PowerBuild.Logging
 
         private void WriteHandler(string message)
         {
-            _cmdlet.Host.UI.Write(_foregroundColor, _cmdlet.Host.UI.RawUI.BackgroundColor, message);
+            _host.UI.Write(_foregroundColor, _host.UI.RawUI.BackgroundColor, message);
         }
     }
 }
