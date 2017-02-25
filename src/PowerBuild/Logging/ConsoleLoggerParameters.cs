@@ -6,7 +6,6 @@ namespace PowerBuild.Logging
     using System;
     using System.Text;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Logging;
 
     [Serializable]
     internal class ConsoleLoggerParameters
@@ -130,7 +129,7 @@ namespace PowerBuild.Logging
 
             if (Verbosity != null)
             {
-                sb.Append($"{nameof(Verbosity)}={Verbosity.Value}");
+                sb.Append($"{nameof(Verbosity)}={Verbosity.Value};");
                 sb.Append(";");
             }
 

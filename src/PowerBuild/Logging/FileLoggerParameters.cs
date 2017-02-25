@@ -6,7 +6,6 @@ namespace PowerBuild.Logging
     using System;
     using System.Text;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Logging;
 
     [Serializable]
     internal class FileLoggerParameters : ConsoleLoggerParameters

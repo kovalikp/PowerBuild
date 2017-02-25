@@ -4,16 +4,14 @@
 namespace PowerBuild.Logging
 {
     using System;
-
-    using System.Management.Automation;
     using System.Management.Automation.Host;
     using Microsoft.Build.Framework;
 
     public class ConsoleLogger : IPowerShellLogger, INodeLogger
     {
-        private readonly PSHost _host;
         private readonly Microsoft.Build.Logging.ConsoleLogger _consoleLogger;
         private readonly ConsoleColor _defaultForegroundColor;
+        private readonly PSHost _host;
         private ConsoleColor _foregroundColor;
 
         public ConsoleLogger(LoggerVerbosity verbosity, PSHost host)

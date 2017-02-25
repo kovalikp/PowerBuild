@@ -6,7 +6,7 @@ namespace PowerBuild
     using System;
     using System.Threading.Tasks;
 
-    public static class MarshalTask
+    internal static class MarshalTask
     {
         public static Task<TResult> FromAsync<TResult>(Func<AsyncCallback, object, IAsyncResult> beginFunc, Func<IAsyncResult, TResult> endFunc)
         {

@@ -130,8 +130,8 @@ namespace PowerBuild
             var crossDomainLoggers = (
                 from unknownLogger in loggers
                 group unknownLogger by unknownLogger is MarshalByRefObject
-                into masrshalByRefLogger
-                from logger in MakeLoggersCrossDomain(masrshalByRefLogger.Key, masrshalByRefLogger)
+                into marshalByRefLogger
+                from logger in MakeLoggersCrossDomain(marshalByRefLogger.Key, marshalByRefLogger)
                 select logger).ToArray();
 
             _msBuildHelper.Loggers = crossDomainLoggers;

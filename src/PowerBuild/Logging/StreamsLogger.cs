@@ -7,7 +7,6 @@ namespace PowerBuild.Logging
     using System.Collections.Concurrent;
     using System.Management.Automation;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Logging;
     using Microsoft.Build.Utilities;
 
     internal class StreamsLogger : Logger, IPowerShellLogger

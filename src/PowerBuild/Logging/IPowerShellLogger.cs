@@ -3,7 +3,6 @@
 
 namespace PowerBuild.Logging
 {
-    using System.Management.Automation.Host;
     using Microsoft.Build.Framework;
 
     public interface IPowerShellLogger : ILogger

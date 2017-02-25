@@ -3,11 +3,9 @@
 
 namespace PowerBuild
 {
-    using System.IO;
     using System.Management.Automation;
     using Logging;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Logging;
 
     [OutputType(typeof(ILogger))]
     [Cmdlet(VerbsCommon.New, "Logger")]
