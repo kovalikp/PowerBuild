@@ -2,34 +2,34 @@
 <Configuration>
   <ViewDefinitions>
     <View>
-      <Name>MSBuildResult</Name>
+      <Name>BuildResult</Name>
       <ViewSelectedBy>
-        <TypeName>PowerBuild.MSBuildResult</TypeName>
+        <TypeName>PowerBuild.BuildResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>
           <TableColumnHeader>
-            <Label>Target</Label>
+            <Label>SubmissionId</Label>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>ResultCode</Label>
+            <Label>OverallResult</Label>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>Items</Label>
+            <Label>Targets</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
           <TableRowEntry>
             <TableColumnItems>
               <TableColumnItem>
-                <PropertyName>Target</PropertyName>
+                <PropertyName>SubmissionId</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>ResultCode</PropertyName>
+                <PropertyName>OverallResult</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>
-                  ($_.Items.Length)
+                  ($_.ResultsByTarget.Keys)
                 </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>

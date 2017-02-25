@@ -63,7 +63,7 @@
     <Compile Include="Logging\LoggerParameters.cs" />
     <Compile Include="MarshalTask.cs" />
     <Compile Include="MSBuildHelper.cs" />
-    <Compile Include="MSBuildResult.cs" />
+    <Compile Include="BuildResult.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\StreamsLogger.cs" />
     <Compile Include="NewConsoleLogger.cs" />
@@ -71,6 +71,7 @@
     <Compile Include="NewLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DefaultLoggerType.cs" />
+    <Compile Include="TargetResult.cs" />
     <Compile Include="TaskAsyncResult.cs" />
     <Compile Include="TaskAsyncResult`1.cs" />
   </ItemGroup>

@@ -11,12 +11,10 @@ namespace PowerBuild
     using Logging;
     using Microsoft.Build.Framework;
 
-    [OutputType(typeof(MSBuildResult))]
+    [OutputType(typeof(BuildResult))]
     [Cmdlet("Invoke", "MSBuild")]
     public class InvokeMSBuild : PSCmdlet
     {
-        private AppDomain _appDomain;
-
         private MSBuildHelper _msBuildHelper;
 
         [Parameter]

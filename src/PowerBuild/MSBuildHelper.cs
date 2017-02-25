@@ -17,7 +17,6 @@ namespace PowerBuild
 
         private CancellationTokenSource _processingCancellationTokenSource;
 
-
         public IEnumerable<ILogger> Loggers { get; set; } = Enumerable.Empty<ILogger>();
 
         public InvokeMSBuildParameters Parameters { get; set; }
@@ -33,14 +32,14 @@ namespace PowerBuild
             return MarshalTask.FromTask(ProcessRecordAsync(), callback, state);
         }
 
-        public IEnumerable<MSBuildResult> EndProcessRecord(IAsyncResult asyncResult)
+        public IEnumerable<BuildResult> EndProcessRecord(IAsyncResult asyncResult)
         {
-            return MarshalTask.GetResult<IEnumerable<MSBuildResult>>(asyncResult);
+            return MarshalTask.GetResult<IEnumerable<BuildResult>>(asyncResult);
         }
 
-        public async Task<IEnumerable<MSBuildResult>> ProcessRecordAsync()
+        public async Task<IEnumerable<BuildResult>> ProcessRecordAsync()
         {
-            var results = Enumerable.Empty<MSBuildResult>();
+            var results = new List<BuildResult>();
             try
             {
                 var parameters = new BuildParameters
@@ -64,8 +63,8 @@ namespace PowerBuild
                         var submission = _buildManager.PendBuildRequest(requestData);
 
                         var buildResult = await submission.ExecuteAsync();
-                        var partialResults = GetMSBuildResults(buildResult).ToArray();
-                        results = results.Union(partialResults);
+                        var partialResult = MapBuildResult(buildResult);
+                        results.Add(partialResult);
                     }
                     finally
                     {
@@ -94,18 +93,24 @@ namespace PowerBuild
             _buildManager = null;
         }
 
-        private IEnumerable<MSBuildResult> GetMSBuildResults(BuildResult buildResult)
+        private BuildResult MapBuildResult(Microsoft.Build.Execution.BuildResult buildResult)
         {
-            return
-                from resultByTarget in buildResult.ResultsByTarget
-                let target = resultByTarget.Key
-                let targetResult = resultByTarget.Value
-                select new MSBuildResult
+            return new BuildResult
+            {
+                Exception = buildResult.Exception,
+                CircularDependency = buildResult.CircularDependency,
+                ConfigurationId = buildResult.ConfigurationId,
+                GlobalRequestId = buildResult.GlobalRequestId,
+                NodeRequestId = buildResult.NodeRequestId,
+                OverallResult = buildResult.OverallResult,
+                ParentGlobalRequestId = buildResult.ParentGlobalRequestId,
+                ResultsByTarget = buildResult.ResultsByTarget.ToDictionary(x => x.Key, x => new TargetResult
                 {
-                    Target = target,
-                    ResultCode = targetResult.ResultCode,
-                    Items = targetResult.Items
-                };
+                    Exception = x.Value.Exception,
+                    ResultCode = x.Value.ResultCode,
+                    Items = x.Value.Items
+                })
+            };
         }
     }
 }

@@ -8,9 +8,9 @@ namespace PowerBuild
 
     internal static class Extensions
     {
-        internal static Task<BuildResult> ExecuteAsync(this BuildSubmission submission)
+        internal static Task<Microsoft.Build.Execution.BuildResult> ExecuteAsync(this BuildSubmission submission)
         {
-            var tcs = new TaskCompletionSource<BuildResult>();
+            var tcs = new TaskCompletionSource<Microsoft.Build.Execution.BuildResult>();
             submission.ExecuteAsync(s => tcs.SetResult(s.BuildResult), null);
             return tcs.Task;
         }
