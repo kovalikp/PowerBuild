@@ -6,8 +6,8 @@ namespace PowerBuild
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Management.Automation;
-    using System.Reflection;
     using Logging;
     using Microsoft.Build.Framework;
 
@@ -28,9 +28,21 @@ namespace PowerBuild
         public string DefaultLoggerParameters { get; set; }
 
         [Parameter]
+        [Alias("ds")]
+        public SwitchParameter DetailedSummary { get; set; }
+
+        [Parameter]
+        [Alias("l")]
+        public ILogger[] Logger { get; set; }
+
+        [Parameter]
         [AllowNull]
         [Alias("m")]
         public int? MaxCpuCount { get; set; } = 1;
+
+        [Parameter]
+        [Alias("nr")]
+        public bool NodeReuse { get; set; }
 
         [Parameter(
             Position = 0,
@@ -57,25 +69,11 @@ namespace PowerBuild
         [Alias("v")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
-        [Parameter]
-        [Alias("nr")]
-        public bool NodeReuse { get; set; }
-
-        [Parameter]
-        [Alias("ds")]
-        public bool? DetailedSummary { get; set; }
-
-        [Parameter]
-        [Alias("l")]
-        public ILogger[] Logger { get; set; }
-
         protected override void BeginProcessing()
         {
             WriteDebug("Begin processing");
             base.BeginProcessing();
-            var configurationPath = Assembly.GetExecutingAssembly().Location + ".config";
-            WriteDebug($"Configuration path: {configurationPath}");
-            _msBuildHelper = MSBuildHelper.CreateCrossDomain(configurationPath, out _appDomain);
+            _msBuildHelper = Factory.Instance.CreateMSBuildHelper();
             _msBuildHelper.BeginProcessing();
         }
 
@@ -84,24 +82,22 @@ namespace PowerBuild
             WriteDebug("End processing");
             _msBuildHelper.StopProcessing();
             _msBuildHelper = null;
-            if (_appDomain != null)
-            {
-                AppDomain.Unload(_appDomain);
-                _appDomain = null;
-            }
-
             base.EndProcessing();
         }
 
         protected override void ProcessRecord()
         {
             WriteDebug("Process record");
-            _msBuildHelper.Project = Project;
-            _msBuildHelper.Verbosity = Verbosity;
-            _msBuildHelper.ToolsVersion = ToolsVersion;
-            _msBuildHelper.Target = Target;
-            _msBuildHelper.MaxCpuCount = MaxCpuCount ?? Environment.ProcessorCount;
-            _msBuildHelper.NodeReuse = NodeReuse;
+            _msBuildHelper.Parameters = new InvokeMSBuildParameters
+            {
+                Project = Project,
+                Verbosity = Verbosity,
+                ToolsVersion = ToolsVersion,
+                Target = Target,
+                MaxCpuCount = MaxCpuCount,
+                NodeReuse = NodeReuse,
+                DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic
+            };
 
             var loggers = new List<ILogger>();
             IPowerShellLogger powerShellLogger;
@@ -123,22 +119,24 @@ namespace PowerBuild
                     throw new InvalidEnumArgumentException();
             }
 
-            if (powerShellLogger != null)
-            {
-                loggers.Add(powerShellLogger);
-                powerShellLogger.ShowSummary = DetailedSummary;
-                powerShellLogger.Parameters = DefaultLoggerParameters;
-            }
-
             if (Logger != null)
             {
                 loggers.AddRange(Logger);
             }
 
-            _msBuildHelper.Loggers = new ILogger[]
+            if (powerShellLogger != null)
             {
-                new CrossDomainLogger(loggers)
-            };
+                loggers.Add(powerShellLogger);
+            }
+
+            var crossDomainLoggers = (
+                from unknownLogger in loggers
+                group unknownLogger by unknownLogger is MarshalByRefObject
+                into masrshalByRefLogger
+                from logger in MakeLoggersCrossDomain(masrshalByRefLogger.Key, masrshalByRefLogger)
+                select logger).ToArray();
+
+            _msBuildHelper.Loggers = crossDomainLoggers;
 
             try
             {
@@ -157,7 +155,13 @@ namespace PowerBuild
         {
             WriteDebug("Stop processing");
             _msBuildHelper.StopProcessing();
+            _msBuildHelper = null;
             base.StopProcessing();
+        }
+
+        private IEnumerable<ILogger> MakeLoggersCrossDomain(bool isMarshalByRef, IEnumerable<ILogger> loggers)
+        {
+            return isMarshalByRef ? loggers : new[] { new CrossDomainLogger(loggers) };
         }
     }
 }

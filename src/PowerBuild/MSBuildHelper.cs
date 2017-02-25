@@ -5,9 +5,7 @@ namespace PowerBuild
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Build.Execution;
@@ -19,34 +17,10 @@ namespace PowerBuild
 
         private CancellationTokenSource _processingCancellationTokenSource;
 
-        public MSBuildHelper()
-        {
-            _buildManager = new BuildManager();
-        }
 
         public IEnumerable<ILogger> Loggers { get; set; } = Enumerable.Empty<ILogger>();
 
-        public string[] Project { get; set; }
-
-        public string[] Target { get; set; }
-
-        public string ToolsVersion { get; set; }
-
-        public int MaxCpuCount { get; set; }
-
-        public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
-
-        public bool NodeReuse { get; set; }
-
-        public static MSBuildHelper CreateCrossDomain(string configurationFile, out AppDomain appDomain)
-        {
-            var appDomainSetup = new AppDomainSetup();
-            appDomainSetup.ApplicationBase = Path.GetDirectoryName(typeof(MSBuildHelper).Assembly.Location);
-            appDomainSetup.ConfigurationFile = configurationFile;
-            appDomain = AppDomain.CreateDomain("invoke-msbuild", AppDomain.CurrentDomain.Evidence, appDomainSetup);
-
-            return (MSBuildHelper)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(MSBuildHelper).FullName);
-        }
+        public InvokeMSBuildParameters Parameters { get; set; }
 
         public void BeginProcessing()
         {
@@ -72,20 +46,21 @@ namespace PowerBuild
                 var parameters = new BuildParameters
                 {
                     Loggers = Loggers,
-                    MaxNodeCount = MaxCpuCount,
-                    DefaultToolsVersion = ToolsVersion,
-                    EnableNodeReuse = NodeReuse
+                    MaxNodeCount = Parameters.MaxCpuCount ?? Environment.ProcessorCount,
+                    DetailedSummary = Parameters.DetailedSummary,
+                    DefaultToolsVersion = Parameters.ToolsVersion,
+                    EnableNodeReuse = Parameters.NodeReuse
                 };
 
-                foreach (var project in Project)
+                foreach (var project in Parameters.Project)
                 {
                     _buildManager.BeginBuild(parameters);
                     try
                     {
                         IDictionary<string, string> globalProperties = new Dictionary<string, string>();
-                        var targetsToBuild = Target ?? new string[0];
+                        var targetsToBuild = Parameters.Target ?? new string[0];
 
-                        var requestData = new BuildRequestData(project, globalProperties, ToolsVersion, targetsToBuild, null);
+                        var requestData = new BuildRequestData(project, globalProperties, Parameters.ToolsVersion, targetsToBuild, null);
                         var submission = _buildManager.PendBuildRequest(requestData);
 
                         var buildResult = await submission.ExecuteAsync();

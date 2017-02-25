@@ -7,8 +7,6 @@ namespace PowerBuild.Logging
 
     public interface IPowerShellLogger : ILogger
     {
-        bool? ShowSummary { get; set; }
-
         void WriteEvents();
     }
 }

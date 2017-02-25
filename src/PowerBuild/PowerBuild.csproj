@@ -52,18 +52,23 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyResources.cs" />
-    <Compile Include="CrossDomainLogger.cs" />
+    <Compile Include="Logging\CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Factory.cs" />
     <Compile Include="InvokeMSBuild.cs" />
+    <Compile Include="InvokeMSBuildParameters.cs" />
+    <Compile Include="Logging\ConsoleLoggerParameters.cs" />
+    <Compile Include="Logging\FileLoggerParameters.cs" />
     <Compile Include="Logging\IPowerShellLogger.cs" />
+    <Compile Include="Logging\InvokeDomainLogger.cs" />
+    <Compile Include="Logging\LoggerParameters.cs" />
     <Compile Include="MarshalTask.cs" />
-    <Compile Include="MessageContainer.cs" />
     <Compile Include="MSBuildHelper.cs" />
     <Compile Include="MSBuildResult.cs" />
     <Compile Include="Logging\HostLogger.cs" />
     <Compile Include="Logging\StreamsLogger.cs" />
-    <Compile Include="NewMSBuildLogger.cs" />
+    <Compile Include="NewFileLogger.cs" />
+    <Compile Include="NewLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DefaultLoggerType.cs" />
     <Compile Include="TaskAsyncResult.cs" />

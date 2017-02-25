@@ -15,14 +15,24 @@ namespace PowerBuild.Tests
             Directory.GetCurrentDirectory();
 
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
-            var configurationPath = Path.Combine(Directory.GetCurrentDirectory(), Assembly.GetExecutingAssembly().GetName().Name + ".dll.config");
-            AppDomain appDomain;
-            var helper = MSBuildHelper.CreateCrossDomain(configurationPath, out appDomain);
+            var configurationFile = Path.Combine(Directory.GetCurrentDirectory(), Assembly.GetExecutingAssembly().GetName().Name + ".dll.config");
+            var appDomainSetup = new AppDomainSetup
+            {
+                ApplicationBase = Path.GetDirectoryName(typeof(MSBuildHelper).Assembly.Location),
+                ConfigurationFile = configurationFile
+            };
+            var appDomain = AppDomain.CreateDomain("powerbuild", AppDomain.CurrentDomain.Evidence, appDomainSetup);
 
-            helper.Project = new[] { project };
-            helper.Target = new[] { "Build" };
-            helper.ToolsVersion = "14.0";
+            var helper = (MSBuildHelper)appDomain.CreateInstanceAndUnwrap(typeof(MSBuildHelper).Assembly.FullName, typeof(MSBuildHelper).FullName);
 
+            var parameters = new InvokeMSBuildParameters
+            {
+                Project = new[] { project },
+                Target = new[] { "Build" },
+                ToolsVersion = "14.0"
+            };
+
+            helper.Parameters = parameters;
             helper.BeginProcessing();
 
             await MarshalTask.FromAsync(helper.BeginProcessRecord, helper.EndProcessRecord);
@@ -36,11 +46,16 @@ namespace PowerBuild.Tests
         {
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
 
-            var helper = new MSBuildHelper
+            var parameters = new InvokeMSBuildParameters
             {
                 Project = new[] { project },
                 Target = new[] { "Build" },
                 ToolsVersion = "14.0"
+            };
+
+            var helper = new MSBuildHelper
+            {
+                Parameters = parameters
             };
 
             helper.BeginProcessing();

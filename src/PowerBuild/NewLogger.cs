@@ -5,12 +5,13 @@ namespace PowerBuild
 {
     using System.IO;
     using System.Management.Automation;
+    using Logging;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
 
-    [OutputType(typeof(MSBuildResult))]
-    [Cmdlet(VerbsCommon.New, "MSBuildLogger")]
-    public class NewMSBuildLogger : PSCmdlet
+    [OutputType(typeof(ILogger))]
+    [Cmdlet(VerbsCommon.New, "Logger")]
+    public class NewLogger : PSCmdlet
     {
         [Parameter(Position = 0)]
         public string Assembly { get; set; }
@@ -28,19 +29,15 @@ namespace PowerBuild
         {
             base.ProcessRecord();
 
-            string assemblyName = null;
-            string assemblyFile = null;
-            if (File.Exists(Assembly))
+            var loggerParameters = new LoggerParameters
             {
-                assemblyFile = Assembly;
-            }
-            else
-            {
-                assemblyName = Assembly;
-            }
+                Assembly = Assembly,
+                ClassName = ClassName,
+                Parameters = Parameters,
+                Verbosity = Verbosity
+            };
 
-            var loggerDescription = new LoggerDescription(ClassName, assemblyName, assemblyFile, Parameters, Verbosity);
-            var logger = loggerDescription.CreateLogger();
+            var logger = Factory.Instance.CreateLogger(loggerParameters);
 
             WriteObject(logger);
         }

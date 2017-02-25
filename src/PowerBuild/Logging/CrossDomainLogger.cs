@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017 Pavol Kovalik. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace PowerBuild
+namespace PowerBuild.Logging
 {
     using System;
     using System.Collections.Generic;
@@ -64,20 +64,6 @@ namespace PowerBuild
         {
             _nodeCount = nodeCount;
             _eventSource = eventSource;
-            _eventSource.MessageRaised += EventSourceOnMessageRaised;
-            _eventSource.ErrorRaised += EventSourceOnErrorRaised;
-            _eventSource.WarningRaised += EventSourceOnWarningRaised;
-            _eventSource.BuildStarted += EventSourceOnBuildStarted;
-            _eventSource.BuildFinished += EventSourceOnBuildFinished;
-            _eventSource.ProjectStarted += EventSourceOnProjectStarted;
-            _eventSource.ProjectFinished += EventSourceOnProjectFinished;
-            _eventSource.TargetStarted += EventSourceOnTargetStarted;
-            _eventSource.TargetFinished += EventSourceOnTargetFinished;
-            _eventSource.TaskStarted += EventSourceOnTaskStarted;
-            _eventSource.TaskFinished += EventSourceOnTaskFinished;
-            _eventSource.CustomEventRaised += EventSourceOnCustomEventRaised;
-            _eventSource.StatusEventRaised += EventSourceOnStatusEventRaised;
-            _eventSource.AnyEventRaised += EventSourceOnAnyEventRaised;
 
             foreach (var logger in _loggers)
             {
@@ -90,6 +76,76 @@ namespace PowerBuild
                 {
                     nodeLogger.Initialize(this, _nodeCount);
                 }
+            }
+
+            if (MessageRaised != null)
+            {
+                _eventSource.MessageRaised += EventSourceOnMessageRaised;
+            }
+
+            if (ErrorRaised != null)
+            {
+                _eventSource.ErrorRaised += EventSourceOnErrorRaised;
+            }
+
+            if (WarningRaised != null)
+            {
+                _eventSource.WarningRaised += EventSourceOnWarningRaised;
+            }
+
+            if (BuildStarted != null)
+            {
+                _eventSource.BuildStarted += EventSourceOnBuildStarted;
+            }
+
+            if (BuildFinished != null)
+            {
+                _eventSource.BuildFinished += EventSourceOnBuildFinished;
+            }
+
+            if (ProjectStarted != null)
+            {
+                _eventSource.ProjectStarted += EventSourceOnProjectStarted;
+            }
+
+            if (ProjectFinished != null)
+            {
+                _eventSource.ProjectFinished += EventSourceOnProjectFinished;
+            }
+
+            if (TargetStarted != null)
+            {
+                _eventSource.TargetStarted += EventSourceOnTargetStarted;
+            }
+
+            if (TargetFinished != null)
+            {
+                _eventSource.TargetFinished += EventSourceOnTargetFinished;
+            }
+
+            if (TaskStarted != null)
+            {
+                _eventSource.TaskStarted += EventSourceOnTaskStarted;
+            }
+
+            if (TaskFinished != null)
+            {
+                _eventSource.TaskFinished += EventSourceOnTaskFinished;
+            }
+
+            if (CustomEventRaised != null)
+            {
+                _eventSource.CustomEventRaised += EventSourceOnCustomEventRaised;
+            }
+
+            if (StatusEventRaised != null)
+            {
+                _eventSource.StatusEventRaised += EventSourceOnStatusEventRaised;
+            }
+
+            if (AnyEventRaised != null)
+            {
+                _eventSource.AnyEventRaised += EventSourceOnAnyEventRaised;
             }
         }
 

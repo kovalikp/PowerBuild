@@ -29,22 +29,6 @@ namespace PowerBuild.Logging
             set { _consoleLogger.Parameters = value; }
         }
 
-        public bool? ShowSummary
-        {
-            get
-            {
-                return _consoleLogger.ShowSummary;
-            }
-
-            set
-            {
-                if (value != null)
-                {
-                    _consoleLogger.ShowSummary = value.Value;
-                }
-            }
-        }
-
         public LoggerVerbosity Verbosity
         {
             get { return _consoleLogger.Verbosity; }
