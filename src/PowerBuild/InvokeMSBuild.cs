@@ -66,7 +66,7 @@ namespace PowerBuild
         [Parameter(HelpMessage = "The version of the MSBuild Toolset (tasks, targets, etc.) to use during build.This version will override the versions specified by individual projects.")]
         [ValidateSet("4.0", "12.0", "14.0")]
         [Alias("tv")]
-        public string ToolsVersion { get; set; }
+        public string ToolsVersion { get; set; } = "14.0";
 
         [Parameter(HelpMessage = "Display this amount of information in the event log.")]
         [Alias("v")]
