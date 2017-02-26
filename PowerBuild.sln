@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8CBBB8E1-4D9
 		src\stylecop.json = src\stylecop.json
 	EndProjectSection
 EndProject
+Project("{FF286327-C783-4F7A-AB73-9BCBAD0D4460}") = "PowerBuild.NuGet", "src\PowerBuild.NuGet\PowerBuild.NuGet.nuproj", "{1224D603-2CEB-4EFE-B596-B0EE7B697DAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{E43053FC-1A8D-4FAA-A299-13B1AD2D4808}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E43053FC-1A8D-4FAA-A299-13B1AD2D4808}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E43053FC-1A8D-4FAA-A299-13B1AD2D4808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1224D603-2CEB-4EFE-B596-B0EE7B697DAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1224D603-2CEB-4EFE-B596-B0EE7B697DAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1224D603-2CEB-4EFE-B596-B0EE7B697DAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1224D603-2CEB-4EFE-B596-B0EE7B697DAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

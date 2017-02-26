@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
+      <PackageDirectory>Tools</PackageDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tools\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\PowerBuild\PowerBuild.dll.config">
+      <Link>tools\PowerBuild.dll.config</Link>
+    </Content>
+    <Content Include="..\PowerBuild\PowerBuild.formats.ps1xml">
+      <Link>tools\PowerBuild.formats.ps1xml</Link>
+    </Content>
+    <Content Include="..\PowerBuild\PowerBuild.psd1">
+      <Link>tools\PowerBuild.psd1</Link>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>1224d603-2ceb-4efe-b596-b0ee7b697daa</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NuProjPath Condition=" '$(NuProjPath)' == '' ">..\..\packages\NuProj.0.11.14-beta\tools\</NuProjPath>
+  </PropertyGroup>
+  <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />
+  <PropertyGroup Label="Configuration">
+    <Id>PowerBuild</Id>
+    <Version>1.0.0</Version>
+    <Title>PowerBuild</Title>
+    <Authors>Pavol Kovalik</Authors>
+    <Owners>Pavol Kovalik</Owners>
+    <Summary>Integrates MSBuild into PowerShell pipeline.</Summary>
+    <Description>Module integrates MSBuild into PowerShell pipeline. Invoke-MSBuild cmdlet writes build result to output stream, which allows further processing by other cmdlets.</Description>
+    <ReleaseNotes>
+    </ReleaseNotes>
+    <ProjectUrl>https://github.com/kovalikp/PowerBuild</ProjectUrl>
+    <LicenseUrl>https://github.com/kovalikp/PowerBuild/blob/master/LICENSE</LicenseUrl>
+    <Copyright>Copyright © Pavol Kovalik</Copyright>
+    <Tags>powershell msbuild</Tags>
+    <GenerateSymbolPackage>true</GenerateSymbolPackage>
+  </PropertyGroup>
+  <Import Project="$(NuProjPath)\NuProj.targets" />
+</Project>
