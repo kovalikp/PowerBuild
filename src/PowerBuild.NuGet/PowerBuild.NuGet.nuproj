@@ -38,7 +38,6 @@
   <Import Project="$(NuProjPath)\NuProj.props" Condition="Exists('$(NuProjPath)\NuProj.props')" />
   <PropertyGroup Label="Configuration">
     <Id>PowerBuild</Id>
-    <Version>1.0.0</Version>
     <Title>PowerBuild</Title>
     <Authors>Pavol Kovalik</Authors>
     <Owners>Pavol Kovalik</Owners>
@@ -53,4 +52,5 @@
     <GenerateSymbolPackage>true</GenerateSymbolPackage>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets')" />
 </Project>
