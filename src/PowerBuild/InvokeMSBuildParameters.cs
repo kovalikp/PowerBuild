@@ -12,7 +12,7 @@ namespace PowerBuild
     {
         public bool DetailedSummary { get; set; }
 
-        public int MaxCpuCount { get; set; }
+        public int MaxCpuCount { get; set; } = 1;
 
         public bool NodeReuse { get; set; }
 
