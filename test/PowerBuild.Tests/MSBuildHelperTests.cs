@@ -7,10 +7,13 @@ using Xunit;
 
 namespace PowerBuild.Tests
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class MSBuildHelperTests
     {
         [Fact]
-        public async Task ProcessRecordCrossDomainTest()
+        public async Task ProcessRecord_BuildCrossDomain()
         {
             Directory.GetCurrentDirectory();
 
@@ -28,8 +31,7 @@ namespace PowerBuild.Tests
             var parameters = new InvokeMSBuildParameters
             {
                 Project = new[] { project },
-                Target = new[] { "Build" },
-                ToolsVersion = "14.0"
+                Target = new[] { "Build" }
             };
 
             helper.Parameters = parameters;
@@ -42,15 +44,14 @@ namespace PowerBuild.Tests
         }
 
         [Fact]
-        public async Task ProcessRecordTest()
+        public async Task ProcessRecord_Build()
         {
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
 
             var parameters = new InvokeMSBuildParameters
             {
                 Project = new[] { project },
-                Target = new[] { "Build" },
-                ToolsVersion = "14.0"
+                Target = new[] { "Build" }
             };
 
             var helper = new MSBuildHelper
@@ -60,9 +61,44 @@ namespace PowerBuild.Tests
 
             helper.BeginProcessing();
 
-            await helper.ProcessRecordAsync();
-
+            var buildResults = await helper.ProcessRecordAsync();
             helper.StopProcessing();
+
+            var buildResult = buildResults.FirstOrDefault();
+            Assert.NotNull(buildResult);
+            Assert.True(buildResult.HasResultsForTarget("Build"));
+            Assert.Equal(3, buildResult.Items.Count());
+        }
+
+        [Fact]
+        public async Task ProcessRecord_ReturnProperty()
+        {
+            var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
+
+            var itemSpec = "ExpectedReturnPropertyValue";
+            var parameters = new InvokeMSBuildParameters
+            {
+                Project = new[] { project },
+                Properties = new Dictionary<string, string>
+                {
+                    ["ReturnPropertyValue"] = itemSpec
+                },
+                Target = new[] { "ReturnProperty" },
+            };
+
+            var helper = new MSBuildHelper
+            {
+                Parameters = parameters,
+            };
+
+            helper.BeginProcessing();
+
+            var buildResults = await helper.ProcessRecordAsync();
+            helper.StopProcessing();
+
+            var buildResult = buildResults.Single();
+            Assert.Equal(1, buildResult["ReturnProperty"].Items.Length);
+            Assert.Equal(itemSpec, buildResult["ReturnProperty"].Items[0].ItemSpec);
         }
     }
 }

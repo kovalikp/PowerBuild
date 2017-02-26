@@ -45,7 +45,7 @@ namespace PowerBuild
                 var parameters = new BuildParameters
                 {
                     Loggers = Loggers,
-                    MaxNodeCount = Parameters.MaxCpuCount ?? Environment.ProcessorCount,
+                    MaxNodeCount = Parameters.MaxCpuCount,
                     DetailedSummary = Parameters.DetailedSummary,
                     DefaultToolsVersion = Parameters.ToolsVersion,
                     EnableNodeReuse = Parameters.NodeReuse
@@ -56,10 +56,9 @@ namespace PowerBuild
                     _buildManager.BeginBuild(parameters);
                     try
                     {
-                        IDictionary<string, string> globalProperties = new Dictionary<string, string>();
                         var targetsToBuild = Parameters.Target ?? new string[0];
 
-                        var requestData = new BuildRequestData(project, globalProperties, Parameters.ToolsVersion, targetsToBuild, null);
+                        var requestData = new BuildRequestData(project, Parameters.Properties, Parameters.ToolsVersion, targetsToBuild, null);
                         var submission = _buildManager.PendBuildRequest(requestData);
 
                         var buildResult = await submission.ExecuteAsync();

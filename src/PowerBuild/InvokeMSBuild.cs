@@ -4,6 +4,7 @@
 namespace PowerBuild
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -25,22 +26,22 @@ namespace PowerBuild
         [Alias("dlp")]
         public string DefaultLoggerParameters { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Shows detailed information at the end of the build about the configurations built and how they were scheduled to nodes")]
         [Alias("ds")]
         public SwitchParameter DetailedSummary { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Use this loggers to log events from MSBuild.")]
         [Alias("l")]
         public ILogger[] Logger { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Specifies the maximum number of concurrent processes to build with.If the switch is not used, the default value used is 1 .If the switch is used with a null value MSBuild will use up to the number of processors on the computer.")]
         [AllowNull]
         [Alias("m")]
         public int? MaxCpuCount { get; set; } = 1;
 
-        [Parameter]
+        [Parameter(HelpMessage = "Enables or Disables the reuse of MSBuild nodes.")]
         [Alias("nr")]
-        public bool NodeReuse { get; set; }
+        public bool? NodeReuse { get; set; } = null;
 
         [Parameter(
             Position = 0,
@@ -51,19 +52,23 @@ namespace PowerBuild
         [ValidateNotNullOrEmpty]
         public string[] Project { get; set; }
 
+        [Alias("p")]
+        [Parameter(HelpMessage = "Set or override these project-level properties.")]
+        public Hashtable Property { get; set; }
+
         [Parameter(
             Position = 1,
             Mandatory = false,
-            HelpMessage = "Target to build.")]
+            HelpMessage = "Build these targets in the project.")]
         [Alias("t")]
         public string[] Target { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "The version of the MSBuild Toolset (tasks, targets, etc.) to use during build.This version will override the versions specified by individual projects.")]
         [ValidateSet("4.0", "12.0", "14.0")]
         [Alias("tv")]
         public string ToolsVersion { get; set; }
 
-        [Parameter]
+        [Parameter(HelpMessage = "Display this amount of information in the event log.")]
         [Alias("v")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
@@ -86,14 +91,19 @@ namespace PowerBuild
         protected override void ProcessRecord()
         {
             WriteDebug("Process record");
+
+            var properties = Property?.Cast<DictionaryEntry>().ToDictionary(x => x.Key.ToString(), x => x.Value.ToString());
+            properties = properties ?? new Dictionary<string, string>();
+
             _msBuildHelper.Parameters = new InvokeMSBuildParameters
             {
                 Project = Project,
                 Verbosity = Verbosity,
                 ToolsVersion = ToolsVersion,
                 Target = Target,
-                MaxCpuCount = MaxCpuCount,
-                NodeReuse = NodeReuse,
+                MaxCpuCount = MaxCpuCount ?? Environment.ProcessorCount,
+                NodeReuse = NodeReuse ?? Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") != "1",
+                Properties = properties,
                 DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic
             };
 

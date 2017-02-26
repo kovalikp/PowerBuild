@@ -4,6 +4,7 @@
 namespace PowerBuild
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.Build.Framework;
 
     [Serializable]
@@ -11,13 +12,15 @@ namespace PowerBuild
     {
         public bool DetailedSummary { get; set; }
 
-        public int? MaxCpuCount { get; set; }
+        public int MaxCpuCount { get; set; }
 
         public bool NodeReuse { get; set; }
 
         public string[] Project { get; set; }
 
-        public string[] Target { get; set; }
+        public IDictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
+
+        public string[] Target { get; set; } = new string[0];
 
         public string ToolsVersion { get; set; }
 

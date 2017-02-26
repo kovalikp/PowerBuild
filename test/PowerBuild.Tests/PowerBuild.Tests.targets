@@ -7,4 +7,6 @@
   </ItemGroup>
   <Target Name="Build" Returns="@(BuildResult)">
   </Target>
+  <Target Name="ReturnProperty" Returns="$(ReturnPropertyValue)">
+  </Target>
 </Project>
