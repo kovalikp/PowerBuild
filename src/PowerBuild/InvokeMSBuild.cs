@@ -12,7 +12,21 @@ namespace PowerBuild
     using Logging;
     using Microsoft.Build.Framework;
 
+    /// <summary>
+    /// Use MSBuild to build a project.
+    /// </summary>
+    /// <para type="synopsis">
+    /// Use MSBuild to build a project.
+    /// </para>
+    /// <para type="description">
+    /// Builds the specified targets in the project file. If a project file is not specified, MSBuild searches
+    /// the current working directory for a file that has a file extension that ends in "proj" and uses that file.
+    /// </para>
+    /// <example>
+    ///   <code>Invoke-MSBuild -Project Project.sln -Target Build -Property @{Configuration=&quot;Release&quot;} -Verbosity Minimal</code>
+    /// </example>
     [OutputType(typeof(BuildResult))]
+    [Alias("msbuild")]
     [Cmdlet("Invoke", "MSBuild")]
     public class InvokeMSBuild : PSCmdlet
     {
@@ -26,49 +40,103 @@ namespace PowerBuild
         [Alias("dlp")]
         public string DefaultLoggerParameters { get; set; }
 
-        [Parameter(HelpMessage = "Shows detailed information at the end of the build about the configurations built and how they were scheduled to nodes")]
+        /// <summary>
+        /// Gets or sets detailed summary parameter.
+        /// </summary>
+        /// <para type="description">
+        /// Shows detailed information at the end of the build about the configurations built and how they were scheduled to nodes.
+        /// </para>
+        [Parameter]
         [Alias("ds")]
         public SwitchParameter DetailedSummary { get; set; }
 
+        /// <summary>
+        /// Get or sets logger collection.
+        /// </summary>
+        /// <para type="description">
+        /// Use this loggers to log events from MSBuild.
+        /// </para>
         [Parameter(HelpMessage = "Use this loggers to log events from MSBuild.")]
         [Alias("l")]
         public ILogger[] Logger { get; set; }
 
-        [Parameter(HelpMessage = "Specifies the maximum number of concurrent processes to build with.If the switch is not used, the default value used is 1 .If the switch is used with a null value MSBuild will use up to the number of processors on the computer.")]
+        /// <summary>
+        /// Gets or sets number of concurrent processes to build with.
+        /// </summary>
+        /// <para type="description">
+        /// Specifies the maximum number of concurrent processes to build with. If the switch is not used, the default
+        /// value used is 1. If the switch is used with a $null, value MSBuild will use up to the number of processors
+        /// on the computer.
+        /// </para>
+        [Parameter]
         [AllowNull]
         [Alias("m")]
         public int? MaxCpuCount { get; set; } = 1;
 
-        [Parameter(HelpMessage = "Enables or Disables the reuse of MSBuild nodes.")]
+        /// <summary>
+        /// Gets or sets node reuse.
+        /// </summary>
+        /// <para type="description">
+        /// Enables or Disables the reuse of MSBuild nodes.
+        /// </para>
+        [Parameter]
         [Alias("nr")]
         public bool? NodeReuse { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets project to build.
+        /// </summary>
+        /// <para type="description">
+        /// Project to build.
+        /// </para>
+        [Alias("FullName")]
         [Parameter(
             Position = 0,
             Mandatory = true,
             ValueFromPipeline = true,
-            ValueFromPipelineByPropertyName = true,
-            HelpMessage = "Project to build.")]
+            ValueFromPipelineByPropertyName = true)]
         [ValidateNotNullOrEmpty]
         public string[] Project { get; set; }
 
+        /// <summary>
+        /// Gets or sets properties.
+        /// </summary>
+        /// <para type="description">
+        /// Set or override these project-level properties.
+        /// </para>
         [Alias("p")]
-        [Parameter(HelpMessage = "Set or override these project-level properties.")]
+        [Parameter]
         public Hashtable Property { get; set; }
 
-        [Parameter(
-            Position = 1,
-            Mandatory = false,
-            HelpMessage = "Build these targets in the project.")]
+        /// <summary>
+        /// Gets or sets targets to build.
+        /// </summary>
+        /// <para type="description">
+        /// Build these targets in the project.
+        /// </para>
+        [Parameter(Position = 1, Mandatory = false)]
         [Alias("t")]
         public string[] Target { get; set; }
 
-        [Parameter(HelpMessage = "The version of the MSBuild Toolset (tasks, targets, etc.) to use during build.This version will override the versions specified by individual projects.")]
+        /// <summary>
+        /// Gets or sets tools version.
+        /// </summary>
+        /// <para type="description">
+        /// The version of the MSBuild Toolset (tasks, targets, etc.) to use during build.This version will override
+        /// the versions specified by individual projects.
+        /// </para>
+        [Parameter]
         [ValidateSet("4.0", "12.0", "14.0")]
         [Alias("tv")]
         public string ToolsVersion { get; set; } = "14.0";
 
-        [Parameter(HelpMessage = "Display this amount of information in the event log.")]
+        /// <summary>
+        /// Gets or sets logging verbosity.
+        /// </summary>
+        /// <para type="description">
+        /// Display this amount of information in the event log.
+        /// </para>
+        [Parameter]
         [Alias("v")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 

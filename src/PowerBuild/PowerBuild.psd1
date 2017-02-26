@@ -24,7 +24,7 @@ Author = 'Pavol Kovalik'
 # CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) 2016 Pavol Kovalik'
+Copyright = '(c) 2017 Pavol Kovalik'
 
 # Description of the functionality provided by this module
 # Description = ''
