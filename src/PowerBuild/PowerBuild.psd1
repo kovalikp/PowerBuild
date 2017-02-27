@@ -12,7 +12,7 @@
 RootModule = 'PowerBuild.dll'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '0.1'
 
 # ID used to uniquely identify this module
 GUID = 'A828E4B5-B57A-4039-AF11-6D16C3DC9A09'
