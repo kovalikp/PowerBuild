@@ -7,9 +7,11 @@ namespace PowerBuild
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.IO;
     using System.Linq;
     using System.Management.Automation;
     using Logging;
+    using Microsoft.Build.CommandLine;
     using Microsoft.Build.Framework;
 
     /// <summary>
@@ -51,12 +53,22 @@ namespace PowerBuild
         public SwitchParameter DetailedSummary { get; set; }
 
         /// <summary>
+        /// Get or sets project extensions to ignore.
+        /// </summary>
+        /// <para type="description">
+        /// List of extensions to ignore when determining which project file to build.
+        /// </para>
+        [Parameter]
+        [Alias("ignore")]
+        public string[] IgnoreProjectExtensions { get; set; }
+
+        /// <summary>
         /// Get or sets logger collection.
         /// </summary>
         /// <para type="description">
         /// Use this loggers to log events from MSBuild.
         /// </para>
-        [Parameter(HelpMessage = "Use this loggers to log events from MSBuild.")]
+        [Parameter]
         [Alias("l")]
         public ILogger[] Logger { get; set; }
 
@@ -92,11 +104,11 @@ namespace PowerBuild
         [Alias("FullName")]
         [Parameter(
             Position = 0,
-            Mandatory = true,
+            Mandatory = false,
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true)]
         [ValidateNotNullOrEmpty]
-        public string[] Project { get; set; }
+        public string Project { get; set; }
 
         /// <summary>
         /// Gets or sets properties.
@@ -163,9 +175,14 @@ namespace PowerBuild
             var properties = Property?.Cast<DictionaryEntry>().ToDictionary(x => x.Key.ToString(), x => x.Value.ToString());
             properties = properties ?? new Dictionary<string, string>();
 
+            var projects = string.IsNullOrEmpty(Project)
+                ? new[] { SessionState.Path.CurrentFileSystemLocation.Path }
+                : new[] { Project };
+            var project = MSBuildApp.ProcessProjectSwitch(projects, IgnoreProjectExtensions, Directory.GetFiles);
+
             _msBuildHelper.Parameters = new InvokeMSBuildParameters
             {
-                Project = Project,
+                Project = project,
                 Verbosity = Verbosity,
                 ToolsVersion = ToolsVersion,
                 Target = Target,

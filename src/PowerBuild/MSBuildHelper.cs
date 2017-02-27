@@ -51,24 +51,21 @@ namespace PowerBuild
                     EnableNodeReuse = Parameters.NodeReuse
                 };
 
-                foreach (var project in Parameters.Project)
+                _buildManager.BeginBuild(parameters);
+                try
                 {
-                    _buildManager.BeginBuild(parameters);
-                    try
-                    {
-                        var targetsToBuild = Parameters.Target ?? new string[0];
+                    var targetsToBuild = Parameters.Target ?? new string[0];
 
-                        var requestData = new BuildRequestData(project, Parameters.Properties, Parameters.ToolsVersion, targetsToBuild, null);
-                        var submission = _buildManager.PendBuildRequest(requestData);
+                    var requestData = new BuildRequestData(Parameters.Project, Parameters.Properties, Parameters.ToolsVersion, targetsToBuild, null);
+                    var submission = _buildManager.PendBuildRequest(requestData);
 
-                        var buildResult = await submission.ExecuteAsync();
-                        var partialResult = MapBuildResult(buildResult);
-                        results.Add(partialResult);
-                    }
-                    finally
-                    {
-                        _buildManager.EndBuild();
-                    }
+                    var buildResult = await submission.ExecuteAsync();
+                    var partialResult = MapBuildResult(buildResult);
+                    results.Add(partialResult);
+                }
+                finally
+                {
+                    _buildManager.EndBuild();
                 }
             }
             catch (OperationCanceledException)

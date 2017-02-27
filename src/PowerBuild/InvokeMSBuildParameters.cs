@@ -16,7 +16,7 @@ namespace PowerBuild
 
         public bool NodeReuse { get; set; }
 
-        public string[] Project { get; set; }
+        public string Project { get; set; }
 
         public IDictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 

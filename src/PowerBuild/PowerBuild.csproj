@@ -53,6 +53,26 @@
     <Reference Include="System.Management.Automation" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\MSbuild\InitializationException.cs">
+      <Link>MSBuild\InitializationException.cs</Link>
+    </Compile>
+    <Compile Include="..\MSbuild\XMake.cs">
+      <Link>MSBuild\XMake.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\ErrorUtilities.cs">
+      <Link>Shared\ErrorUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\FileDelegates.cs">
+      <Link>Shared\FileDelegates.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\InternalErrorException.cs">
+      <Link>Shared\InternalErrorException.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\ResourceUtilities.cs">
+      <Link>Shared\ResourceUtilities.cs</Link>
+    </Compile>
+    <Compile Include="AssemblyResources.cs" />
+    <Compile Include="FileUtilities.cs" />
     <Compile Include="Logging\CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Factory.cs" />

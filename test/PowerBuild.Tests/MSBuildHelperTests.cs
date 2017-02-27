@@ -30,7 +30,7 @@ namespace PowerBuild.Tests
 
             var parameters = new InvokeMSBuildParameters
             {
-                Project = new[] { project },
+                Project = project,
                 Target = new[] { "Build" }
             };
 
@@ -50,7 +50,7 @@ namespace PowerBuild.Tests
 
             var parameters = new InvokeMSBuildParameters
             {
-                Project = new[] { project },
+                Project = project,
                 Target = new[] { "Build" }
             };
 
@@ -78,7 +78,7 @@ namespace PowerBuild.Tests
             var itemSpec = "ExpectedReturnPropertyValue";
             var parameters = new InvokeMSBuildParameters
             {
-                Project = new[] { project },
+                Project = project,
                 Properties = new Dictionary<string, string>
                 {
                     ["ReturnPropertyValue"] = itemSpec
