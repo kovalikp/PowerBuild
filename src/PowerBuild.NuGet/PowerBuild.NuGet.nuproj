@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
       <PackageDirectory>Tools</PackageDirectory>
+      <PackageOutputGroups>$(PackageOutputGroups);XmlDoc2CmdletDoc</PackageOutputGroups>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

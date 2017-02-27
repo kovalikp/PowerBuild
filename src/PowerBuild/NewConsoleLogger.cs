@@ -7,53 +7,107 @@ namespace PowerBuild
     using Logging;
     using Microsoft.Build.Framework;
 
+    /// <para type="synopsis">
+    /// Create new console logger.
+    /// </para>
+    /// <para type="description">
+    /// Create new configured console logger. Parameters are equivalent of msbuild.exe's /consoleloggerparameters:&lt;parameters&gt; switch.
+    /// </para>
+    /// <example>
+    ///   <code>New-ConsoleLogger -Verbosity Minimal -PerformanceSummary</code>
+    /// </example>
     [OutputType(typeof(ILogger))]
     [Cmdlet(VerbsCommon.New, "ConsoleLogger")]
     public class NewConsoleLogger : PSCmdlet
     {
-        [Parameter(HelpMessage = "Use the default console colors for all logging messages.")]
+        /// <para type="description">
+        /// Use the default console colors for all logging messages.
+        /// </para>
+        [Parameter]
         public SwitchParameter DisableConsoleColor { get; set; }
 
-        [Parameter(HelpMessage = "Disable the multiprocessor logging style of output when running in non - multiprocessor mode.")]
+        /// <para type="description">
+        /// Disable the multiprocessor logging style of output when running in non - multiprocessor mode.
+        /// </para>
+        [Parameter]
         public SwitchParameter DisableMPLogging { get; set; }
 
-        [Parameter(HelpMessage = "Enable the multiprocessor logging style even when running in non - multiprocessor mode.This logging style is on by default.")]
+        /// <para type="description">
+        /// Enable the multiprocessor logging style even when running in non - multiprocessor mode.This logging style is on by default.
+        /// </para>
+        [Parameter]
         public SwitchParameter EnableMPLogging { get; set; }
 
-        [Parameter(HelpMessage = "Show only errors.")]
+        /// <para type="description">
+        /// Show only errors.
+        /// </para>
+        [Parameter]
         public SwitchParameter ErrorsOnly { get; set; }
 
-        [Parameter(HelpMessage = "Use ANSI console colors even if console does not support it.")]
+        /// <para type="description">
+        /// Use ANSI console colors even if console does not support it.
+        /// </para>
+        [Parameter]
         public SwitchParameter ForceConsoleColor { get; set; }
 
-        [Parameter(HelpMessage = "Does not align the text to the size of the console buffer.")]
+        /// <para type="description">
+        /// Does not align the text to the size of the console buffer.
+        /// </para>
+        [Parameter]
         public SwitchParameter ForceNoAlign { get; set; }
 
-        [Parameter(HelpMessage = "Don't show list of items and properties at the start of each project build.")]
+        /// <para type="description">
+        /// Don't show list of items and properties at the start of each project build.
+        /// </para>
+        [Parameter]
         public SwitchParameter NoItemAndPropertyList { get; set; }
 
-        [Parameter(HelpMessage = "Don't show error and warning summary at the end.")]
+        /// <para type="description">
+        /// Don't show error and warning summary at the end.
+        /// </para>
+        [Parameter]
         public SwitchParameter NoSummary { get; set; }
 
-        [Parameter(HelpMessage = "Show time spent in tasks, targets and projects.")]
+        /// <para type="description">
+        /// Show time spent in tasks, targets and projects.
+        /// </para>
+        [Parameter]
         public SwitchParameter PerformanceSummary { get; set; }
 
-        [Parameter(HelpMessage = "Show TaskCommandLineEvent messages.")]
+        /// <para type="description">
+        /// Show TaskCommandLineEvent messages.
+        /// </para>
+        [Parameter]
         public SwitchParameter ShowCommandLine { get; set; }
 
-        [Parameter(HelpMessage = "Show eventId for started events, finished events, and messages")]
+        /// <para type="description">
+        /// Show eventId for started events, finished events, and messages.
+        /// </para>
+        [Parameter]
         public SwitchParameter ShowEventId { get; set; }
 
-        [Parameter(HelpMessage = "Display the Timestamp as a prefix to any message.")]
+        /// <para type="description">
+        /// Display the Timestamp as a prefix to any message.
+        /// </para>
+        [Parameter]
         public SwitchParameter ShowTimestamp { get; set; }
 
-        [Parameter(HelpMessage = "Show error and warning summary at the end.")]
+        /// <para type="description">
+        /// Show error and warning summary at the end.
+        /// </para>
+        [Parameter]
         public SwitchParameter Summary { get; set; }
 
-        [Parameter(Position = 0, HelpMessage = "Overrides the Verbosity setting for this logger. Default verbosity is Normal.")]
+        /// <para type="description">
+        /// Overrides the Verbosity setting for this logger. Default verbosity is Normal.
+        /// </para>
+        [Parameter(Position = 0)]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
-        [Parameter(HelpMessage = "Show only warnings.")]
+        /// <para type="description">
+        /// Show only warnings.
+        /// </para>
+        [Parameter]
         public SwitchParameter WarningsOnly { get; set; }
 
         protected override void ProcessRecord()

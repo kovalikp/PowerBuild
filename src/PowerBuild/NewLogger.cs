@@ -7,20 +7,41 @@ namespace PowerBuild
     using Logging;
     using Microsoft.Build.Framework;
 
+    /// <para type="synopsis">
+    /// Create new logger.
+    /// </para>
+    /// <para type="description">
+    /// Create new logger using class name and assembly. Parameters are equivalent of msbuild.exe's /l:&lt;logger&gt; switch.
+    /// </para>
+    /// <example>
+    ///   <code>New-Logger -ClassName FileLogger -Assembly Microsoft.Build.Engine -Parameters &quot;LogFile=MyLog.log;Append;Verbosity=diagnostic;Encoding=UTF-8&quot;</code>
+    /// </example>
     [OutputType(typeof(ILogger))]
     [Cmdlet(VerbsCommon.New, "Logger")]
     public class NewLogger : PSCmdlet
     {
-        [Parameter(Position = 0, HelpMessage = "Logger assembly name or file path.")]
+        /// <para type="description">
+        /// Logger assembly name or file path.
+        /// </para>
+        [Parameter(Position = 1)]
         public string Assembly { get; set; }
 
-        [Parameter(Position = 1, HelpMessage = "Logger class name. Can contain partial or full namespace.")]
+        /// <para type="description">
+        /// Logger class name. Can contain partial or full namespace.
+        /// </para>
+        [Parameter(Position = 0)]
         public string ClassName { get; set; }
 
-        [Parameter(Position = 2, HelpMessage = "Parameters passed to logger.")]
+        /// <para type="description">
+        /// Parameters passed to logger.
+        /// </para>
+        [Parameter(Position = 2)]
         public string Parameters { get; set; }
 
-        [Parameter(Position = 3, HelpMessage = "Overrides the Verbosity setting for this logger. Default verbosity is Normal.")]
+        /// <para type="description">
+        /// Overrides the Verbosity setting for this logger. Default verbosity is Normal.
+        /// </para>
+        [Parameter(Position = 3)]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
         protected override void ProcessRecord()
