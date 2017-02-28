@@ -8,8 +8,10 @@ before_build:
   - nuget restore
 
 build_script:
-- cmd: '"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe" /nologo /m /v:m /nr:false /flp:verbosity=detailed'
+- cmd: '"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe" /nologo /m /v:m /nr:false /flp:verbosity=detailed /p:Configuration=Release'
 
 artifacts:
  - path: src\PowerBuild.NuGet\bin\**\*.nupkg
    name: Packages
+ - path: src\PowerBuild\bin\Release
+   name: Binaries
