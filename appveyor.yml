@@ -1,6 +1,6 @@
 version: 0.1.{build}
 os: Visual Studio 2015
-
+configuration: Release
 cache:
  - 'packages -> **\packages.config'
 
@@ -8,10 +8,20 @@ before_build:
   - nuget restore
 
 build_script:
-- cmd: '"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe" /nologo /m /v:m /nr:false /flp:verbosity=detailed /p:Configuration=Release'
+- cmd: '"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe" /nologo /m /v:m /nr:false /flp:verbosity=detailed'
 
 artifacts:
- - path: src\PowerBuild.NuGet\bin\**\*.nupkg
+ - path: src\PowerBuild.NuGet\bin\$(configuration)\*.nupkg
    name: Packages
- - path: src\PowerBuild\bin\Release
+ - path: src\PowerBuild\bin\$(configuration)
    name: Binaries
+
+deploy:
+- provider: GitHub
+  tag: v$(appveyor_build_version)
+  release: PowerBuild v$(appveyor_build_version)
+  auth_token:
+    secure: APGL8cPNS/Yihuur9QesHkbiWSDDzXzUIxrtgvHUQkJ11VJwxTTAMbPhNOR+I3SIvvLvTBVPerfjCiE6dInmmfqm728D/aIYJrh/iuMLI1c=
+  artifact: Binaries,Packages
+  draft: true
+  prerelease: false
