@@ -25,3 +25,5 @@ deploy:
   artifact: Binaries,Packages
   draft: true
   prerelease: false
+  on:
+    branch: master                 # release from master branch only
