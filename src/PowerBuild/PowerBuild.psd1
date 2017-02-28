@@ -27,7 +27,7 @@ Author = 'Pavol Kovalik'
 Copyright = '(c) 2017 Pavol Kovalik'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Integrate MSBuild into PowerShell pipeline.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
@@ -39,7 +39,7 @@ PowerShellVersion = '5.0'
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module
-# DotNetFrameworkVersion = ''
+DotNetFrameworkVersion = '4.5'
 
 # Minimum version of the common language runtime (CLR) required by this module
 CLRVersion = '4.0'

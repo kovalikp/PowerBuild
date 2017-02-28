@@ -49,7 +49,7 @@
     <ProjectUrl>https://github.com/kovalikp/PowerBuild</ProjectUrl>
     <LicenseUrl>https://github.com/kovalikp/PowerBuild/blob/master/LICENSE</LicenseUrl>
     <Copyright>Copyright © Pavol Kovalik</Copyright>
-    <Tags>powershell msbuild</Tags>
+    <Tags>PSModule powershell msbuild</Tags>
     <GenerateSymbolPackage>true</GenerateSymbolPackage>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
