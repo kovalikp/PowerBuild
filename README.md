@@ -4,6 +4,15 @@
 
 PowerBuild module provides full MSBuild integration into PowerShell pipeline. Invoke-MSBuild cmdlet writes build results into output stream, making them available for processing by other cmdlets.
 
+## Getting started:
+
+You can get the module from the [PowerShell Gallery](https://www.powershellgallery.com/packages/PowerBuild) by executing following script.
+
+```powershell
+Install-Module -Name PowerBuild 
+```
+## Using PowerBuild
+
 Invoke MSBuild and store results to local variable.
 
 ```powershell
@@ -16,5 +25,18 @@ Manipulate results in pipeline.
 ```powershell
 PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,MetadataCount
 ```
+
+### Logging
+
+Default logger can be specified using `-DefaultLogger` parameter. The parameter currently recognized these values.
+ - None - Disables default logger.
+ - Streams (Default) - Uses Error, Warning and Verbose streams to write logs.
+ - Host - Uses PowerShell host console to write logs. This is equivalent of msbuild.exe's console logger.
+ 
+Level of logging is affected by `-Verbose` parameter.
+
+Additional loggers can be created using `New-Logger`, `New-ConsoleLogger` or `New-FileLogger` commnandlets and passed to `-Logger` parameter.
+
+### Example
 
 ![Console](doc/Console.png)
