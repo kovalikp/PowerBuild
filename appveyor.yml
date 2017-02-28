@@ -15,15 +15,3 @@ artifacts:
    name: Packages
  - path: src\PowerBuild\bin\$(configuration)
    name: Binaries
-
-deploy:
-- provider: GitHub
-  tag: v$(appveyor_build_version)
-  release: PowerBuild v$(appveyor_build_version)
-  auth_token:
-    secure: SZBNXkG0/lQEfOixUOzPARVZi3pOzDFXoNYxdxic0QfU9kd9eMo6J4xQCp2a3zHz
-  artifact: Binaries,Packages
-  draft: true
-  prerelease: false
-  on:
-    branch: master                 # release from master branch only
