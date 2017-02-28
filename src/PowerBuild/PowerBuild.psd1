@@ -61,7 +61,7 @@ CLRVersion = '4.0'
 
 # Format files (.ps1xml) to be loaded when importing this module
 FormatsToProcess = @(
-	'PowerBuild.formats.ps1xml'
+    'PowerBuild.formats.ps1xml'
 )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
@@ -72,10 +72,10 @@ FormatsToProcess = @(
 
 # Cmdlets to export from this module
 CmdletsToExport = @(
-	'Invoke-MSBuild',
-	'New-ConsoleLogger',
-	'New-FileLogger',
-	'New-Logger'
+    'Invoke-MSBuild',
+    'New-ConsoleLogger',
+    'New-FileLogger',
+    'New-Logger'
 )
 
 
@@ -92,7 +92,28 @@ CmdletsToExport = @(
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-# PrivateData = ''
+PrivateData = @{
+
+    PSData = @{
+
+        # Tags applied to this module. These help with module discovery in online galleries.
+        Tags = @('powershell', 'msbuild', 'invoke-msbuild')
+
+        # A URL to the license for this module.
+        LicenseUri = 'https://github.com/kovalikp/PowerBuild/blob/master/LICENSE'
+
+        # A URL to the main website for this project.
+        ProjectUri = 'https://github.com/kovalikp/PowerBuild'
+
+        # A URL to an icon representing this module.
+        # IconUri = ''
+
+        # ReleaseNotes of this module
+        # ReleaseNotes = ''
+
+    }
+
+}
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''

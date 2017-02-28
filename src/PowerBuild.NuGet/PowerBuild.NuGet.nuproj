@@ -42,14 +42,14 @@
     <Title>PowerBuild</Title>
     <Authors>Pavol Kovalik</Authors>
     <Owners>Pavol Kovalik</Owners>
-    <Summary>Integrates MSBuild into PowerShell pipeline.</Summary>
+    <Summary>Integrate MSBuild into PowerShell pipeline.</Summary>
     <Description>Module integrates MSBuild into PowerShell pipeline. Invoke-MSBuild cmdlet writes build result to output stream, which allows further processing by other cmdlets.</Description>
     <ReleaseNotes>
     </ReleaseNotes>
     <ProjectUrl>https://github.com/kovalikp/PowerBuild</ProjectUrl>
     <LicenseUrl>https://github.com/kovalikp/PowerBuild/blob/master/LICENSE</LicenseUrl>
     <Copyright>Copyright © Pavol Kovalik</Copyright>
-    <Tags>PSModule powershell msbuild</Tags>
+    <Tags>PSModule powershell msbuild invoke-msbuild</Tags>
     <GenerateSymbolPackage>true</GenerateSymbolPackage>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
