@@ -10,6 +10,7 @@ namespace PowerBuild
     using System.Threading;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
+    using Microsoft.Build.Logging.StructuredLogger;
     using PowerBuild.Logging;
 
     internal class Factory : MarshalByRefObject
@@ -60,9 +61,21 @@ namespace PowerBuild
             return Wrap(logger);
         }
 
+        public ILogger CreateStructuredLogger(string logFile)
+        {
+            var logger = new StructuredLogger();
+            logger.Parameters = logFile;
+            return Wrap(logger);
+        }
+
         public MSBuildHelper CreateMSBuildHelper()
         {
             return new MSBuildHelper();
+        }
+
+        public void SetCurrentDirectory(string path)
+        {
+            Environment.CurrentDirectory = path;
         }
 
         private static AppDomain CreateInvokeAppDomain()

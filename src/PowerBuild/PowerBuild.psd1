@@ -75,7 +75,8 @@ CmdletsToExport = @(
     'Invoke-MSBuild',
     'New-ConsoleLogger',
     'New-FileLogger',
-    'New-Logger'
+    'New-Logger',
+    'New-StructuredLogger'
 )
 
 

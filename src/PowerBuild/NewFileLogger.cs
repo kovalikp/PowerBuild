@@ -14,7 +14,7 @@ namespace PowerBuild
     /// Create new configured file logger. Parameters are equivalent of msbuild.exe's /fileloggerparameters:&lt;parameters&gt; switch.
     /// </para>
     /// <example>
-    ///   <code>New-FileLogger -Verbosity Normal -PerformanceSummary</code>
+    ///   <code>New-FileLogger build.log -Verbosity Normal -PerformanceSummary</code>
     /// </example>
     [OutputType(typeof(ILogger))]
     [Cmdlet(VerbsCommon.New, "FileLogger")]

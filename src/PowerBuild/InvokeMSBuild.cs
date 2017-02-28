@@ -156,6 +156,7 @@ namespace PowerBuild
         {
             WriteDebug("Begin processing");
             base.BeginProcessing();
+            Factory.InvokeInstance.SetCurrentDirectory(SessionState.Path.CurrentFileSystemLocation.Path);
             _msBuildHelper = Factory.InvokeInstance.CreateMSBuildHelper();
             _msBuildHelper.BeginProcessing();
         }
