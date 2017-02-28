@@ -21,7 +21,7 @@ deploy:
   tag: v$(appveyor_build_version)
   release: PowerBuild v$(appveyor_build_version)
   auth_token:
-    secure: APGL8cPNS/Yihuur9QesHkbiWSDDzXzUIxrtgvHUQkJ11VJwxTTAMbPhNOR+I3SIvvLvTBVPerfjCiE6dInmmfqm728D/aIYJrh/iuMLI1c=
+    secure: SZBNXkG0/lQEfOixUOzPARVZi3pOzDFXoNYxdxic0QfU9kd9eMo6J4xQCp2a3zHz
   artifact: Binaries,Packages
   draft: true
   prerelease: false
