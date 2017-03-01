@@ -73,6 +73,12 @@
     <Compile Include="..\MSbuild\InitializationException.cs">
       <Link>MSBuild\InitializationException.cs</Link>
     </Compile>
+    <Compile Include="..\MSbuild\Strings.Designer.cs">
+      <Link>MSBuild\Strings.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="..\MSbuild\XMake.cs">
       <Link>MSBuild\XMake.cs</Link>
     </Compile>
@@ -87,6 +93,12 @@
     </Compile>
     <Compile Include="..\Shared\ResourceUtilities.cs">
       <Link>Shared\ResourceUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Strings.shared.Designer.cs">
+      <Link>Shared\Strings.shared.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.shared.resx</DependentUpon>
     </Compile>
     <Compile Include="AssemblyResources.cs" />
     <Compile Include="FileUtilities.cs" />
@@ -133,6 +145,18 @@
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\MSbuild\Strings.resx">
+      <Link>MSBuild\Strings.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Shared\Strings.shared.resx">
+      <Link>Shared\Strings.shared.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.shared.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\NuProj.Common.0.11.14-beta\build\dotnet\NuProj.Common.targets" Condition="Exists('..\..\packages\NuProj.Common.0.11.14-beta\build\dotnet\NuProj.Common.targets')" />
