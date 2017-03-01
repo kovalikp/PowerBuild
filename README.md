@@ -1,6 +1,6 @@
 # PowerBuild
 
-[![Build status](https://ci.appveyor.com/api/projects/status/vvw9k1nrvdv2r0ep/branch/master?svg=true)](https://ci.appveyor.com/project/kovalikp/powerbuild/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/fc7d02clkwwx46wt/branch/master?svg=true)](https://ci.appveyor.com/project/kovalikp/powerbuild/branch/master)
 
 PowerBuild module provides full MSBuild integration into PowerShell pipeline. Unlike simmilar modules that provide wrapper around `msbuild.exe`, PowerBuild's `Invoke-MSBuild` cmdlet uses `Microstft.Build` API directly. It means it can write build results into output, making the results available for processing by other cmdlets. Default logger utilizes Error, Warning and Verbose streams to log MSBuild events.
 
