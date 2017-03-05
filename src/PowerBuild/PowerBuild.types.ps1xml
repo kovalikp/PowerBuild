@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>PowerBuild.TaskItem</Name>
+    <Members>
+      <CodeProperty>
+        <Name>Name</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+          <MethodName>GetName</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+      <CodeProperty>
+        <Name>ItemSpec</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+          <MethodName>GetItemSpec</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+      <CodeProperty>
+        <Name>MetadataCount</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+          <MethodName>GetMetadataCount</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+      <CodeProperty>
+        <Name>MetadataNames</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+          <MethodName>GetMetadataNames</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+    </Members>
+    <TypeAdapter>
+      <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+    </TypeAdapter>
+  </Type>
+</Types>

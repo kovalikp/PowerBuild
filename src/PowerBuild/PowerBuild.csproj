@@ -126,6 +126,8 @@
     <Compile Include="TargetResult.cs" />
     <Compile Include="TaskAsyncResult.cs" />
     <Compile Include="TaskAsyncResult`1.cs" />
+    <Compile Include="TaskItem.cs" />
+    <Compile Include="TaskItemAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PowerBuild.dll.config">
@@ -133,6 +135,9 @@
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="PowerBuild.types.ps1xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="PowerBuild.formats.ps1xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

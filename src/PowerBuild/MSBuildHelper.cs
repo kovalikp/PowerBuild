@@ -104,7 +104,7 @@ namespace PowerBuild
                 {
                     Exception = x.Value.Exception,
                     ResultCode = x.Value.ResultCode,
-                    Items = x.Value.Items
+                    Items = x.Value.Items.Select<ITaskItem, ITaskItem>(y => new TaskItem(y)).ToArray()
                 })
             };
         }
