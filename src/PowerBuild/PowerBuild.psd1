@@ -39,7 +39,7 @@ PowerShellVersion = '5.0'
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module
-DotNetFrameworkVersion = '4.5'
+DotNetFrameworkVersion = '4.6'
 
 # Minimum version of the common language runtime (CLR) required by this module
 CLRVersion = '4.0'
@@ -52,7 +52,7 @@ CLRVersion = '4.0'
 
 # Assemblies that must be loaded prior to importing this module
 RequiredAssemblies = @(
-    'PowerBuild.dll', 'Microsoft.Build.dll', 'Microsoft.Build.Framework.dll'
+    'PowerBuild.dll'
 )
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
@@ -80,8 +80,7 @@ CmdletsToExport = @(
     'New-ConsoleLogger',
     'New-FileLogger',
     'New-Logger',
-    'New-StructuredLogger',
-    "Select-Metadata"
+    'New-StructuredLogger'
 )
 
 

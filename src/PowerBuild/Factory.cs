@@ -61,6 +61,11 @@ namespace PowerBuild
             return Wrap(logger);
         }
 
+        public MSBuildHelper CreateMSBuildHelper()
+        {
+            return new MSBuildHelper();
+        }
+
         public ILogger CreateStructuredLogger(string logFile)
         {
             var logger = new StructuredLogger();
@@ -68,9 +73,9 @@ namespace PowerBuild
             return Wrap(logger);
         }
 
-        public MSBuildHelper CreateMSBuildHelper()
+        public override object InitializeLifetimeService()
         {
-            return new MSBuildHelper();
+            return null;
         }
 
         public void SetCurrentDirectory(string path)
