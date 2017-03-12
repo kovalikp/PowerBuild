@@ -127,6 +127,7 @@ namespace PowerBuild
         /// Build these targets in the project.
         /// </para>
         [Parameter(Position = 1, Mandatory = false)]
+        [ArgumentCompleter(typeof(TargetArgumentCompleter))]
         [Alias("t")]
         public string[] Target { get; set; }
 
