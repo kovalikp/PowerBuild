@@ -23,6 +23,9 @@
     <Content Include="..\PowerBuild\PowerBuild.formats.ps1xml">
       <Link>PowerBuild.formats.ps1xml</Link>
     </Content>
+    <Content Include="..\PowerBuild\PowerBuild.types.ps1xml">
+      <Link>PowerBuild.types.ps1xml</Link>
+    </Content>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>1224d603-2ceb-4efe-b596-b0ee7b697daa</ProjectGuid>
