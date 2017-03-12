@@ -175,6 +175,13 @@
   </Target>
   <Import Project="..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets')" />
   <Import Project="..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets" Condition="Exists('..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets')" />
+  <PropertyGroup>
+    <PowerShellExe Condition=" '$(PowerShellExe)'=='' ">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
+    <ModuleManifestPath>$(TargetDir)$(AssemblyName).psd1</ModuleManifestPath>
+  </PropertyGroup>
+  <Target Name="UpdateModuleManifest" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="$(ModuleManifestPath)">
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -command &quot;Update-ModuleManifest -Path &apos;$(ModuleManifestPath)&apos; -ModuleVersion &apos;$(BuildVersion)&apos;&quot;" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

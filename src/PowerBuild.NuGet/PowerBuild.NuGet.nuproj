@@ -13,7 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
       <PackageDirectory>Tools</PackageDirectory>
-      <PackageOutputGroups>$(PackageOutputGroups);XmlDoc2CmdletDoc</PackageOutputGroups>
+      <PackageOutputGroups>$(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest</PackageOutputGroups>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -25,9 +25,6 @@
     </Content>
     <Content Include="..\PowerBuild\PowerBuild.formats.ps1xml">
       <Link>tools\PowerBuild.formats.ps1xml</Link>
-    </Content>
-    <Content Include="..\PowerBuild\PowerBuild.psd1">
-      <Link>tools\PowerBuild.psd1</Link>
     </Content>
   </ItemGroup>
   <PropertyGroup Label="Globals">
