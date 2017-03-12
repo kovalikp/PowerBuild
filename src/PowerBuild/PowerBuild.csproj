@@ -180,7 +180,7 @@
     <ModuleManifestPath>$(TargetDir)$(AssemblyName).psd1</ModuleManifestPath>
   </PropertyGroup>
   <Target Name="UpdateModuleManifest" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="$(ModuleManifestPath)">
-    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -command &quot;Update-ModuleManifest -Path &apos;$(ModuleManifestPath)&apos; -ModuleVersion &apos;$(BuildVersion)&apos;&quot;" WorkingDirectory="$(TargetDir)" />
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -command &quot;Set-Location &apos;$(TargetDir)&apos;;Update-ModuleManifest -Path &apos;$(ModuleManifestPath)&apos; -ModuleVersion &apos;$(BuildVersion)&apos;&quot;" WorkingDirectory="$(TargetDir)" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
