@@ -12,19 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
-      <PackageDirectory>Tools</PackageDirectory>
+      <PackageDirectory>root</PackageDirectory>
       <PackageOutputGroups>$(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest</PackageOutputGroups>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="tools\" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\PowerBuild\PowerBuild.dll.config">
-      <Link>tools\PowerBuild.dll.config</Link>
+      <Link>PowerBuild.dll.config</Link>
     </Content>
     <Content Include="..\PowerBuild\PowerBuild.formats.ps1xml">
-      <Link>tools\PowerBuild.formats.ps1xml</Link>
+      <Link>PowerBuild.formats.ps1xml</Link>
     </Content>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -48,6 +45,7 @@
     <Copyright>Copyright © Pavol Kovalik</Copyright>
     <Tags>PSModule powershell msbuild invoke-msbuild</Tags>
     <GenerateSymbolPackage>true</GenerateSymbolPackage>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
   <Import Project="..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets')" />
