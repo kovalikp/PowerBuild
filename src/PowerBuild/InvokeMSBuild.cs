@@ -165,7 +165,7 @@ namespace PowerBuild
         protected override void EndProcessing()
         {
             WriteDebug("End processing");
-            _msBuildHelper.StopProcessing();
+            _msBuildHelper.EndProcessing();
             _msBuildHelper = null;
             base.EndProcessing();
         }

@@ -8,6 +8,8 @@ using System.Management.Automation.Language;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Build.CommandLine;
+using Microsoft.Build.Construction;
+using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 
 namespace PowerBuild
@@ -23,20 +25,49 @@ namespace PowerBuild
         {
             try
             {
-                string Project = null;
-                var IgnoreProjectExtensions = new string[0];
+                string projectPath = null;
+                var ignoreProjectExtensions = new string[] { ".metaproj" };
 
                 var sessionState = new SessionState();
-                var projects = string.IsNullOrEmpty(Project)
+                var projects = string.IsNullOrEmpty(projectPath)
                     ? new[] { sessionState.Path.CurrentFileSystemLocation.Path }
-                    : new[] { Project };
-                var project = MSBuildApp.ProcessProjectSwitch(projects, IgnoreProjectExtensions, Directory.GetFiles);
+                    : new[] { projectPath };
+                var projectFile = MSBuildApp.ProcessProjectSwitch(projects, ignoreProjectExtensions, Directory.GetFiles);
 
-                var properties = new Dictionary<string, string>();
+
+                var globalProperties = new Dictionary<string, string>();
+
                 var toolsVersion = "14.0";
-                var projectInstance = new ProjectInstance(project, properties, toolsVersion);
-                var targets = projectInstance.Targets
-                    .Select(x => x.Key);
+
+                if (FileUtilities.IsSolutionFilename(projectFile))
+                {
+                    var oldMSBuildEmitSolution = Environment.GetEnvironmentVariable("MSBuildEmitSolution");
+                    var helper = Factory.InvokeInstance.CreateMSBuildHelper();
+                    try
+                    {
+                        helper.BeginProcessing();
+                        helper.Parameters = new InvokeMSBuildParameters
+                        {
+                            Project = projectFile,
+                            Verbosity = Microsoft.Build.Framework.LoggerVerbosity.Quiet,
+                            ToolsVersion = toolsVersion,
+                            Target = new string[] { "ValidateProjects" },
+                            Properties = globalProperties,
+                        };
+                        var asyncResult = helper.BeginProcessRecord(null, null);
+                        var results = helper.EndProcessRecord(asyncResult);
+                        projectFile = projectFile + ".metaproj";
+                    }
+                    finally
+                    {
+                        Environment.SetEnvironmentVariable("MSBuildEmitSolution", oldMSBuildEmitSolution);
+                        helper.EndProcessing();
+                    }
+                }
+
+                var project = new Project(projectFile, globalProperties, toolsVersion);
+                IEnumerable<string> targets = project.Targets.Select(x => x.Key);
+
                 if (!string.IsNullOrEmpty(wordToComplete))
                 {
                     targets = targets.Where(x => x.StartsWith(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
