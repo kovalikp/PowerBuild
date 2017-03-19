@@ -7,8 +7,9 @@ cache:
 before_build:
   - nuget restore
 
-build_script:
-- cmd: '"%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe" /nologo /m /v:m /nr:false /flp:verbosity=detailed'
+build:
+  parallel: true
+  verbosity: minimal
 
 artifacts:
  - path: src\PowerBuild.NuGet\bin\$(configuration)\*.nupkg
