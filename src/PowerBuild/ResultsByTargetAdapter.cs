@@ -3,35 +3,34 @@
 
 namespace PowerBuild
 {
-    using System.Collections;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Management.Automation;
-    using Microsoft.Build.Framework;
 
-    public sealed class TaskItemAdapter : PSPropertyAdapter
+    public class ResultsByTargetAdapter : PSPropertyAdapter
     {
-        public static string GetItemSpec(PSObject obj)
+        public static int GetCount(PSObject obj)
         {
-            return ((ITaskItem)obj.BaseObject).ItemSpec;
+            return ((ResultsByTarget)obj.BaseObject).Count;
         }
 
-        public static int GetMetadataCount(PSObject obj)
+        public static IEnumerable<string> GetKeys(PSObject obj)
         {
-            return ((ITaskItem)obj.BaseObject).MetadataCount;
+            return ((ResultsByTarget)obj.BaseObject).Keys;
         }
 
-        public static ICollection GetMetadataNames(PSObject obj)
+        public static IEnumerable<TargetResult> GetValues(PSObject obj)
         {
-            return ((ITaskItem)obj.BaseObject).MetadataNames;
+            return ((ResultsByTarget)obj.BaseObject).Values;
         }
 
         public override Collection<PSAdaptedProperty> GetProperties(object baseObject)
         {
             var result = new Collection<PSAdaptedProperty>();
-            var taskItem = (ITaskItem)baseObject;
-            foreach (string metadataName in taskItem.MetadataNames)
+            var resultsByTarget = (ResultsByTarget)baseObject;
+            foreach (string key in resultsByTarget.Keys)
             {
-                result.Add(new PSAdaptedProperty(metadataName, metadataName));
+                result.Add(new PSAdaptedProperty(key, key));
             }
 
             return result;
@@ -44,13 +43,14 @@ namespace PowerBuild
 
         public override string GetPropertyTypeName(PSAdaptedProperty adaptedProperty)
         {
-            return typeof(string).ToString();
+            var type = typeof(TargetResult);
+            return typeof(TargetResult).FullName;
         }
 
         public override object GetPropertyValue(PSAdaptedProperty adaptedProperty)
         {
-            var taskItem = adaptedProperty.BaseObject as ITaskItem;
-            return taskItem?.GetMetadata((string)adaptedProperty.Tag);
+            var resultsByTarget = (ResultsByTarget)adaptedProperty.BaseObject;
+            return resultsByTarget[(string)adaptedProperty.Tag];
         }
 
         public override bool IsGettable(PSAdaptedProperty adaptedProperty)

@@ -60,7 +60,7 @@ namespace PowerBuild
                     var submission = _buildManager.PendBuildRequest(requestData);
 
                     var buildResult = await submission.ExecuteAsync();
-                    var partialResult = MapBuildResult(buildResult);
+                    var partialResult = MapBuildResult(Parameters.Project, buildResult);
                     results.Add(partialResult);
                 }
                 finally
@@ -89,10 +89,11 @@ namespace PowerBuild
             _buildManager = null;
         }
 
-        private BuildResult MapBuildResult(Microsoft.Build.Execution.BuildResult buildResult)
+        private BuildResult MapBuildResult(string project, Microsoft.Build.Execution.BuildResult buildResult)
         {
             return new BuildResult
             {
+                Project = project,
                 Exception = buildResult.Exception,
                 CircularDependency = buildResult.CircularDependency,
                 ConfigurationId = buildResult.ConfigurationId,
@@ -100,12 +101,13 @@ namespace PowerBuild
                 NodeRequestId = buildResult.NodeRequestId,
                 OverallResult = buildResult.OverallResult,
                 ParentGlobalRequestId = buildResult.ParentGlobalRequestId,
-                ResultsByTarget = buildResult.ResultsByTarget.ToDictionary(x => x.Key, x => new TargetResult
+                ResultsByTarget = new ResultsByTarget(buildResult.ResultsByTarget.ToDictionary(x => x.Key, x => new TargetResult
                 {
+                    Name = x.Key,
                     Exception = x.Value.Exception,
                     ResultCode = x.Value.ResultCode,
-                    Items = x.Value.Items.Select<ITaskItem, ITaskItem>(y => new TaskItem(y)).ToArray()
-                })
+                    Items = x.Value.Items.Select(y => (ITaskItem)new TaskItem(y)).ToArray()
+                }))
             };
         }
     }

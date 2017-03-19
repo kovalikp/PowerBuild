@@ -4,13 +4,6 @@
     <Name>PowerBuild.TaskItem</Name>
     <Members>
       <CodeProperty>
-        <Name>Name</Name>
-        <GetCodeReference>
-          <TypeName>PowerBuild.TaskItemAdapter</TypeName>
-          <MethodName>GetName</MethodName>
-        </GetCodeReference>
-      </CodeProperty>
-      <CodeProperty>
         <Name>ItemSpec</Name>
         <GetCodeReference>
           <TypeName>PowerBuild.TaskItemAdapter</TypeName>
@@ -34,6 +27,35 @@
     </Members>
     <TypeAdapter>
       <TypeName>PowerBuild.TaskItemAdapter</TypeName>
+    </TypeAdapter>
+  </Type>
+  <Type>
+    <Name>PowerBuild.ResultsByTarget</Name>
+    <Members>
+      <CodeProperty>
+        <Name>Count</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.ResultsByTargetAdapter</TypeName>
+          <MethodName>GetCount</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+      <CodeProperty>
+        <Name>Keys</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.ResultsByTargetAdapter</TypeName>
+          <MethodName>GetKeys</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+      <CodeProperty>
+        <Name>Values</Name>
+        <GetCodeReference>
+          <TypeName>PowerBuild.ResultsByTargetAdapter</TypeName>
+          <MethodName>GetValues</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+    </Members>
+    <TypeAdapter>
+      <TypeName>PowerBuild.ResultsByTargetAdapter</TypeName>
     </TypeAdapter>
   </Type>
 </Types>

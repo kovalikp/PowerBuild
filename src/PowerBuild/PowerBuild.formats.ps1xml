@@ -7,20 +7,32 @@
         <TypeName>PowerBuild.BuildResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
+        <AutoSize />
         <TableHeaders>
           <TableColumnHeader>
+            <Label>Project</Label>
+          </TableColumnHeader>
+          <TableColumnHeader>
             <Label>SubmissionId</Label>
+            <Alignment>Right</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>OverallResult</Label>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>Targets</Label>
+            <Label>ResultsByTarget</Label>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Exception</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
           <TableRowEntry>
             <TableColumnItems>
+              <TableColumnItem>
+                <ScriptBlock>[System.IO.Path]::GetFileName($_.Project)</ScriptBlock>
+              </TableColumnItem>
               <TableColumnItem>
                 <PropertyName>SubmissionId</PropertyName>
               </TableColumnItem>
@@ -29,7 +41,12 @@
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>
-                  ($_.ResultsByTarget.Keys)
+                  ($_.ResultsByTarget.Count)
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  ($_.Exception.Message)
                 </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
@@ -37,18 +54,73 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    
     <View>
-      <Name>TaskItem</Name>
+      <Name>BuildResult</Name>
       <ViewSelectedBy>
-        <TypeName>PowerBuild.TaskItem</TypeName>
+        <TypeName>PowerBuild.BuildResult</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <PropertyName>Project</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>CircularDependency</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>ConfigurationId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>Exception</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>GlobalRequestId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>NodeRequestId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>OverallResult</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>ParentGlobalRequestId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>SubmissionId</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>ResultsByTarget</Label>
+                <ScriptBlock>($_.ResultsByTarget.Values)</ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    
+    <View>
+      <Name>TargetResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PowerBuild.TargetResult</TypeName>
       </ViewSelectedBy>
       <TableControl>
+        <AutoSize />
         <TableHeaders>
           <TableColumnHeader>
             <Label>Name</Label>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>MetadataNames</Label>
+            <Label>ResultCode</Label>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Items</Label>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Exception</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
@@ -58,7 +130,49 @@
                 <PropertyName>Name</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>MetadataNames</PropertyName>
+                <PropertyName>ResultCode</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $_.Items.Length
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  ($_.Exception.Message)
+                </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+
+    <View>
+      <Name>TaskItem</Name>
+      <ViewSelectedBy>
+        <TypeName>PowerBuild.TaskItem</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>ItemSpec</Label>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MetadataCount</Label>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>ItemSpec</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>MetadataCount</PropertyName>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

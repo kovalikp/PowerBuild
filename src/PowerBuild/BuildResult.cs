@@ -46,7 +46,7 @@ namespace PowerBuild
 
         /// <summary>Gets an enumerator over all target results in this build result set.</summary>
         /// <returns>Returns an enumerator over all target results in this build result set.</returns>
-        public IDictionary<string, TargetResult> ResultsByTarget { get; internal set; }
+        public IReadOnlyDictionary<string, TargetResult> ResultsByTarget { get; internal set; }
 
         /// <summary>Gets the build submission which this build result set is associated with.</summary>
         /// <returns>Returns the build submission which this build result set is associated with.</returns>
@@ -55,6 +55,8 @@ namespace PowerBuild
         /// <summary>Gets an enumerator over all targets in this build result set.</summary>
         /// <returns>Returns an enumerator over all targets in this build result set.</returns>
         public IEnumerable<ITargetResult> Targets => ResultsByTarget.Values;
+
+        public string Project { get; internal set; }
 
         /// <summary>Gets an indexer which can be used to get the build result for the given target.</summary>
         /// <returns>The build result for the indexed target.</returns>

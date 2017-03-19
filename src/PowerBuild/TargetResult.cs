@@ -18,6 +18,10 @@ namespace PowerBuild
         /// <returns>Returns the set of build items output by the target. </returns>
         public ITaskItem[] Items { get; internal set; }
 
+        /// <summary>Gets the name of the target.</summary>
+        /// <returns>Returns the name of the target.</returns>
+        public string Name { get; internal set; }
+
         /// <summary>Gets the result code returned when the target was built.</summary>
         /// <returns>Returns the result code returned when the target was built.</returns>
         public TargetResultCode ResultCode { get; internal set; }
