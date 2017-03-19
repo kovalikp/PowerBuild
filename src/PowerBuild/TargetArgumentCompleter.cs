@@ -38,7 +38,7 @@ namespace PowerBuild
             var sessionState = new SessionState();
             var projects = string.IsNullOrEmpty(projectPath)
                 ? new[] { sessionState.Path.CurrentFileSystemLocation.Path }
-                : new[] { projectPath };
+                : new[] { Path.Combine(sessionState.Path.CurrentFileSystemLocation.Path, projectPath) };
             var projectFile = MSBuildApp.ProcessProjectSwitch(projects, ignoreProjectExtensions, Directory.GetFiles);
 
             var targets = FileUtilities.IsSolutionFilename(projectFile)
