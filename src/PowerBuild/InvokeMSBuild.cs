@@ -76,14 +76,13 @@ namespace PowerBuild
         /// Gets or sets number of concurrent processes to build with.
         /// </summary>
         /// <para type="description">
-        /// Specifies the maximum number of concurrent processes to build with. If the switch is not used, the default
-        /// value used is 1. If the switch is used with a $null, value MSBuild will use up to the number of processors
-        /// on the computer.
+        /// Specifies the maximum number of concurrent processes to build with. If the switch is not used,
+        /// MSBuild will use up to the number of processors on the computer.
         /// </para>
         [Parameter]
         [AllowNull]
         [Alias("m")]
-        public int? MaxCpuCount { get; set; } = 1;
+        public int? MaxCpuCount { get; set; } = Environment.ProcessorCount;
 
         /// <summary>
         /// Gets or sets node reuse.
@@ -128,6 +127,7 @@ namespace PowerBuild
         /// </para>
         [Parameter(Position = 1, Mandatory = false)]
         [Alias("t")]
+        [ArgumentCompleter(typeof(TargetArgumentCompleter))]
         public string[] Target { get; set; }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace PowerBuild
         [Parameter]
         [ValidateSet("4.0", "12.0", "14.0")]
         [Alias("tv")]
-        public string ToolsVersion { get; set; } = "14.0";
+        public string ToolsVersion { get; set; } = InvokeMSBuildParameters.DefaultToolsVersion;
 
         /// <summary>
         /// Gets or sets logging verbosity.
@@ -164,7 +164,7 @@ namespace PowerBuild
         protected override void EndProcessing()
         {
             WriteDebug("End processing");
-            _msBuildHelper.StopProcessing();
+            _msBuildHelper.EndProcessing();
             _msBuildHelper = null;
             base.EndProcessing();
         }

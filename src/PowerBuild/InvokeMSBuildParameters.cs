@@ -10,6 +10,8 @@ namespace PowerBuild
     [Serializable]
     internal class InvokeMSBuildParameters
     {
+        public const string DefaultToolsVersion = "14.0";
+
         public bool DetailedSummary { get; set; }
 
         public int MaxCpuCount { get; set; } = 1;

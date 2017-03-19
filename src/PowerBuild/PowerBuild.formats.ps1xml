@@ -150,6 +150,34 @@
     </View>
 
     <View>
+      <Name>TargetResult</Name>
+      <ViewSelectedBy>
+        <TypeName>PowerBuild.TargetResult</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <PropertyName>Name</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>ResultCode</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Items</Label>
+                <ScriptBlock>($_.Items | select -expand ItemSpec) -join "`n"</ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <PropertyName>Exception</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+
+    <View>
       <Name>TaskItem</Name>
       <ViewSelectedBy>
         <TypeName>PowerBuild.TaskItem</TypeName>

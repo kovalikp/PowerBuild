@@ -81,7 +81,7 @@ namespace PowerBuild
             _processingCancellationTokenSource.Cancel();
         }
 
-        protected void EndProcessing()
+        public void EndProcessing()
         {
             _processingCancellationTokenSource?.Dispose();
             _buildManager?.Dispose();
