@@ -28,7 +28,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Shared;
 
 #if (!STANDALONEBUILD)
-using Microsoft.Internal.Performance;
+//using Microsoft.Internal.Performance;
 #endif
 #if MSBUILDENABLEVSPROFILING 
 using Microsoft.VisualStudio.Profiler;

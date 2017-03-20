@@ -48,7 +48,9 @@ namespace PowerBuild
                     MaxNodeCount = Parameters.MaxCpuCount,
                     DetailedSummary = Parameters.DetailedSummary,
                     DefaultToolsVersion = Parameters.ToolsVersion,
-                    EnableNodeReuse = Parameters.NodeReuse
+                    EnableNodeReuse = Parameters.NodeReuse,
+                    WarningsAsErrors = Parameters.WarningsAsErrors,
+                    WarningsAsMessages = Parameters.WarningsAsMessages
                 };
 
                 _buildManager.BeginBuild(parameters);

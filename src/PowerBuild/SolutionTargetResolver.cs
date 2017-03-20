@@ -26,6 +26,8 @@ namespace PowerBuild
         /// </summary>
         private static readonly string[] InitialTargets =
         {
+            "Restore",
+            "GenerateRestoreGraphFile",
             "ValidateSolutionConfiguration",
             "ValidateToolsVersions",
             "ValidateProjects",

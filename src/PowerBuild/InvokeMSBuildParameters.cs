@@ -10,7 +10,7 @@ namespace PowerBuild
     [Serializable]
     internal class InvokeMSBuildParameters
     {
-        public const string DefaultToolsVersion = "14.0";
+        public const string DefaultToolsVersion = "15.0";
 
         public bool DetailedSummary { get; set; }
 
@@ -27,5 +27,9 @@ namespace PowerBuild
         public string ToolsVersion { get; set; }
 
         public LoggerVerbosity Verbosity { get; set; }
+
+        public ISet<string> WarningsAsErrors { get; set; }
+
+        public ISet<string> WarningsAsMessages { get; set; }
     }
 }

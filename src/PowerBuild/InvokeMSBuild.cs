@@ -82,7 +82,7 @@ namespace PowerBuild
         [Parameter]
         [AllowNull]
         [Alias("m")]
-        public int? MaxCpuCount { get; set; } = Environment.ProcessorCount;
+        public int? MaxCpuCount { get; set; } = 1; // Environment.ProcessorCount;
 
         /// <summary>
         /// Gets or sets node reuse.
@@ -152,6 +152,26 @@ namespace PowerBuild
         [Alias("v")]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
 
+        /// <summary>
+        /// Gets or sets logging verbosity.
+        /// </summary>
+        /// <para type="description">
+        /// List of warning codes to treats as errors. To treat all warnings as errors use the switch with empty list '-WarningsAsErrors @()'.
+        /// </para>
+        [Parameter]
+        [Alias("err")]
+        public string[] WarningsAsErrors { get; set; }
+
+        /// <summary>
+        /// Gets or sets logging verbosity.
+        /// </summary>
+        /// <para type="description">
+        /// List of warning codes to treats as low importance messages.
+        /// </para>
+        [Parameter]
+        [Alias("nowarn")]
+        public string[] WarningsAsMessages { get; set; }
+
         protected override void BeginProcessing()
         {
             WriteDebug("Begin processing");
@@ -190,7 +210,9 @@ namespace PowerBuild
                 MaxCpuCount = MaxCpuCount ?? Environment.ProcessorCount,
                 NodeReuse = NodeReuse ?? Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") != "1",
                 Properties = properties,
-                DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic
+                DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic,
+                WarningsAsErrors = WarningsAsErrors == null ? null : new HashSet<string>(WarningsAsErrors, StringComparer.InvariantCultureIgnoreCase),
+                WarningsAsMessages = WarningsAsMessages == null ? null : new HashSet<string>(WarningsAsMessages, StringComparer.InvariantCultureIgnoreCase)
             };
 
             var loggers = new List<ILogger>();
