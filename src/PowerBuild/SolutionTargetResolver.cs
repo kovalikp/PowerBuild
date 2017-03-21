@@ -5,6 +5,7 @@ namespace PowerBuild
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using Microsoft.Build.Construction;
 
@@ -34,10 +35,24 @@ namespace PowerBuild
             "GetSolutionConfigurationContents",
         };
 
-        public static IEnumerable<string> GetSolutionTargets(string solutionFile)
+        public static IEnumerable<string> GetSolutionTargets(string solutionFile, string configuration, string platform)
         {
             var solution = SolutionFile.Parse(solutionFile);
-            var selectedSolutionConfiguration = $"{solution.GetDefaultConfigurationName()}|{solution.GetDefaultPlatformName()}";
+            if (string.IsNullOrEmpty(configuration))
+            {
+                configuration = solution.GetDefaultConfigurationName();
+            }
+
+            if (string.IsNullOrEmpty(platform))
+            {
+                platform = solution.GetDefaultPlatformName();
+            }
+
+            var selectedSolutionConfiguration = $"{configuration}|{platform}";
+            if (!solution.SolutionConfigurations.Any(x => x.FullName.Equals(selectedSolutionConfiguration, StringComparison.OrdinalIgnoreCase)))
+            {
+                selectedSolutionConfiguration = $"{solution.GetDefaultConfigurationName()}|{solution.GetDefaultPlatformName()}";
+            }
 
             var result = new List<string>();
             result.AddRange(InitialTargets);

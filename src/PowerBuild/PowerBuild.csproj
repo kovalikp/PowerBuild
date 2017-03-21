@@ -108,7 +108,9 @@
       <DependentUpon>Strings.shared.resx</DependentUpon>
     </Compile>
     <Compile Include="AssemblyResources.cs" />
+    <Compile Include="ConfigurationArgumentCompleter.cs" />
     <Compile Include="FileUtilities.cs" />
+    <Compile Include="InvokeMSBuildArgumentCompleterBase.cs" />
     <Compile Include="Logging\CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Factory.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="NewConsoleLogger.cs" />
     <Compile Include="NewFileLogger.cs" />
     <Compile Include="NewLogger.cs" />
+    <Compile Include="PlatformArgumentCompleter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DefaultLoggerType.cs" />
     <Compile Include="ResultsByTargetAdapter.cs" />

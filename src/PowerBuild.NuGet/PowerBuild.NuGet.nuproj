@@ -51,5 +51,5 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.5.97\build\dotnet\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets')" />
 </Project>

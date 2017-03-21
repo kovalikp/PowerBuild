@@ -76,8 +76,10 @@ namespace PowerBuild
         /// Gets or sets number of concurrent processes to build with.
         /// </summary>
         /// <para type="description">
-        /// Specifies the maximum number of concurrent processes to build with. If the switch is not used,
-        /// MSBuild will use up to the number of processors on the computer.
+        /// Specifies the maximum number of concurrent processes to build with.
+        /// </para>
+        /// <para type="description">
+        /// There is a bug in MSBuild 15.1 that causes build to fail if value is set above 1.
         /// </para>
         [Parameter]
         [AllowNull]
@@ -116,7 +118,7 @@ namespace PowerBuild
         /// Set or override these project-level properties.
         /// </para>
         [Alias("p")]
-        [Parameter]
+        [Parameter(Mandatory = false)]
         public Hashtable Property { get; set; }
 
         /// <summary>
@@ -172,6 +174,26 @@ namespace PowerBuild
         [Alias("nowarn")]
         public string[] WarningsAsMessages { get; set; }
 
+        /// <summary>
+        /// Gets or sets Configuration preoperty.
+        /// </summary>
+        /// <para type="description">
+        /// Set build Configuration property.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        [ArgumentCompleter(typeof(ConfigurationArgumentCompleter))]
+        public string Configuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets Platform preoperty.
+        /// </summary>
+        /// <para type="description">
+        /// Set build Platform property.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        [ArgumentCompleter(typeof(PlatformArgumentCompleter))]
+        public string Platform { get; set; }
+
         protected override void BeginProcessing()
         {
             WriteDebug("Begin processing");
@@ -194,12 +216,22 @@ namespace PowerBuild
             WriteDebug("Process record");
 
             var properties = Property?.Cast<DictionaryEntry>().ToDictionary(x => x.Key.ToString(), x => x.Value.ToString());
-            properties = properties ?? new Dictionary<string, string>();
+            properties = properties ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var projects = string.IsNullOrEmpty(Project)
                 ? new[] { SessionState.Path.CurrentFileSystemLocation.Path }
                 : new[] { Project };
             var project = MSBuildApp.ProcessProjectSwitch(projects, IgnoreProjectExtensions, Directory.GetFiles);
+
+            if (!string.IsNullOrEmpty(Configuration))
+            {
+                properties[nameof(Configuration)] = Configuration;
+            }
+
+            if (!string.IsNullOrEmpty(Platform))
+            {
+                properties[nameof(Platform)] = Platform;
+            }
 
             _msBuildHelper.Parameters = new InvokeMSBuildParameters
             {

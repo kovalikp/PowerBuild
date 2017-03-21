@@ -6,7 +6,6 @@ namespace PowerBuild
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Shared;
 
@@ -90,7 +89,7 @@ namespace PowerBuild
             }
         }
 
-        public TaskItem(ITaskItem taskItem) 
+        public TaskItem(ITaskItem taskItem)
             : this(taskItem.ItemSpec, taskItem.CloneCustomMetadata())
         {
             _taskItem = taskItem;
