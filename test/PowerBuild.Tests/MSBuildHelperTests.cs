@@ -21,7 +21,7 @@ namespace PowerBuild.Tests
             var configurationFile = Path.Combine(Directory.GetCurrentDirectory(), Assembly.GetExecutingAssembly().GetName().Name + ".dll.config");
             var appDomainSetup = new AppDomainSetup
             {
-                ApplicationBase = Path.GetDirectoryName(typeof(MSBuildHelper).Assembly.Location),
+                ApplicationBase = Directory.GetCurrentDirectory(),
                 ConfigurationFile = configurationFile
             };
             var appDomain = AppDomain.CreateDomain("powerbuild", AppDomain.CurrentDomain.Evidence, appDomainSetup);
