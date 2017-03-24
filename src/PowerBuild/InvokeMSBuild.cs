@@ -140,7 +140,7 @@ namespace PowerBuild
         /// the versions specified by individual projects.
         /// </para>
         [Parameter]
-        [ValidateSet("4.0", "12.0", "14.0")]
+        [ValidateSet("2.0", "3.5", "4.0", "12.0", "14.0", "15.0")]
         [Alias("tv")]
         public string ToolsVersion { get; set; } = InvokeMSBuildParameters.DefaultToolsVersion;
 
@@ -175,7 +175,7 @@ namespace PowerBuild
         public string[] WarningsAsMessages { get; set; }
 
         /// <summary>
-        /// Gets or sets Configuration preoperty.
+        /// Gets or sets Configuration property.
         /// </summary>
         /// <para type="description">
         /// Set build Configuration property.
@@ -185,7 +185,7 @@ namespace PowerBuild
         public string Configuration { get; set; }
 
         /// <summary>
-        /// Gets or sets Platform preoperty.
+        /// Gets or sets Platform property.
         /// </summary>
         /// <para type="description">
         /// Set build Platform property.
