@@ -55,8 +55,8 @@
       <HintPath>..\..\packages\Microsoft.Build.Utilities.Core.15.1.548\lib\net46\Microsoft.Build.Utilities.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StructuredLogger, Version=1.0.123.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Build.Logging.StructuredLogger.1.0.123\lib\net46\StructuredLogger.dll</HintPath>
+    <Reference Include="StructuredLogger, Version=1.0.127.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Build.Logging.StructuredLogger.1.0.127\lib\net46\StructuredLogger.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -144,22 +144,23 @@
     <Compile Include="TaskItemAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PowerBuild.dll.config">
+    <None Include="app.config" />
+    <!--<None Include="PowerBuild.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </None>
+    </None>-->
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="PowerBuild.types.ps1xml">
+    <Content Include="PowerBuild.types.ps1xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="PowerBuild.formats.ps1xml">
+    </Content>
+    <Content Include="PowerBuild.formats.ps1xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="PowerBuild.psd1">
+    </Content>
+    <Content Include="PowerBuild.psd1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
@@ -186,7 +187,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\NuProj.Common.0.11.14-beta\build\dotnet\NuProj.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NuProj.Common.0.11.14-beta\build\dotnet\NuProj.Common.targets'))" />
     <Error Condition="!Exists('..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
   <Import Project="..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets" Condition="Exists('..\..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets')" />
   <PropertyGroup>
@@ -196,7 +197,8 @@
   <Target Name="UpdateModuleManifest" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="$(ModuleManifestPath)">
     <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -command &quot;Update-ModuleManifest -Path '$(ModuleManifestPath)' -ModuleVersion '$(BuildVersionSimple)'&quot;" />
   </Target>
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets')" />
+  <Target Name="AppConfigFile" DependsOnTargets="_CopyAppConfigFile" Returns="$(TargetPath).config"  />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

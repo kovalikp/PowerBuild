@@ -13,19 +13,10 @@
   <ItemGroup>
     <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
       <PackageDirectory>root</PackageDirectory>
-      <PackageOutputGroups>$(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest</PackageOutputGroups>
+      <PackageOutputGroups>
+        $(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest;ContentFilesProjectOutputGroup;AppConfigFile
+      </PackageOutputGroups>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\PowerBuild\PowerBuild.dll.config">
-      <Link>PowerBuild.dll.config</Link>
-    </Content>
-    <Content Include="..\PowerBuild\PowerBuild.formats.ps1xml">
-      <Link>PowerBuild.formats.ps1xml</Link>
-    </Content>
-    <Content Include="..\PowerBuild\PowerBuild.types.ps1xml">
-      <Link>PowerBuild.types.ps1xml</Link>
-    </Content>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>1224d603-2ceb-4efe-b596-b0ee7b697daa</ProjectGuid>
@@ -51,5 +42,5 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
   <Import Project="$(NuProjPath)\NuProj.targets" />
-  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.21\build\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets')" />
 </Project>
