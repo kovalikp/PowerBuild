@@ -32,6 +32,14 @@ namespace PowerBuild
             return MarshalTask.FromTask(ProcessRecordAsync(), callback, state);
         }
 
+        public void EndProcessing()
+        {
+            _processingCancellationTokenSource?.Dispose();
+            _buildManager?.Dispose();
+            _processingCancellationTokenSource = null;
+            _buildManager = null;
+        }
+
         public IEnumerable<BuildResult> EndProcessRecord(IAsyncResult asyncResult)
         {
             return MarshalTask.GetResult<IEnumerable<BuildResult>>(asyncResult);
@@ -42,6 +50,23 @@ namespace PowerBuild
             var results = new List<BuildResult>();
             try
             {
+                bool logTaskInputs = Parameters.Verbosity == LoggerVerbosity.Diagnostic;
+
+                if (!logTaskInputs)
+                {
+                    foreach (var logger in Loggers)
+                    {
+                        if ((logger.Parameters != null &&
+                            (logger.Parameters.IndexOf("V=DIAG", StringComparison.OrdinalIgnoreCase) != -1 ||
+                            logger.Parameters.IndexOf("VERBOSITY=DIAG", StringComparison.OrdinalIgnoreCase) != -1)) ||
+                            logger.Verbosity == LoggerVerbosity.Diagnostic)
+                        {
+                            logTaskInputs = true;
+                            break;
+                        }
+                    }
+                }
+
                 var parameters = new BuildParameters
                 {
                     Loggers = Loggers,
@@ -50,7 +75,8 @@ namespace PowerBuild
                     DefaultToolsVersion = Parameters.ToolsVersion,
                     EnableNodeReuse = Parameters.NodeReuse,
                     WarningsAsErrors = Parameters.WarningsAsErrors,
-                    WarningsAsMessages = Parameters.WarningsAsMessages
+                    WarningsAsMessages = Parameters.WarningsAsMessages,
+                    LogTaskInputs = logTaskInputs,
                 };
 
                 _buildManager.BeginBuild(parameters);
@@ -81,14 +107,6 @@ namespace PowerBuild
         {
             _buildManager.CancelAllSubmissions();
             _processingCancellationTokenSource.Cancel();
-        }
-
-        public void EndProcessing()
-        {
-            _processingCancellationTokenSource?.Dispose();
-            _buildManager?.Dispose();
-            _processingCancellationTokenSource = null;
-            _buildManager = null;
         }
 
         private BuildResult MapBuildResult(string project, Microsoft.Build.Execution.BuildResult buildResult)

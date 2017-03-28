@@ -82,9 +82,9 @@ namespace PowerBuild
         /// There is a bug in MSBuild 15.1 that causes build to fail if value is set above 1.
         /// </para>
         [Parameter]
-        [AllowNull]
         [Alias("m")]
-        public int? MaxCpuCount { get; set; } = 1; // Environment.ProcessorCount;
+        [ValidateRange(1, int.MaxValue)]
+        public int MaxCpuCount { get; set; } = 1; // Environment.ProcessorCount;
 
         /// <summary>
         /// Gets or sets node reuse.
@@ -239,7 +239,7 @@ namespace PowerBuild
                 Verbosity = Verbosity,
                 ToolsVersion = ToolsVersion,
                 Target = Target,
-                MaxCpuCount = MaxCpuCount ?? Environment.ProcessorCount,
+                MaxCpuCount = MaxCpuCount,
                 NodeReuse = NodeReuse ?? Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") != "1",
                 Properties = properties,
                 DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic,

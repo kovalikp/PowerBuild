@@ -37,7 +37,7 @@
     <ProjectUrl>https://github.com/kovalikp/PowerBuild</ProjectUrl>
     <LicenseUrl>https://github.com/kovalikp/PowerBuild/blob/master/LICENSE</LicenseUrl>
     <Copyright>Copyright © Pavol Kovalik</Copyright>
-    <Tags>PSModule powershell msbuild invoke-msbuild</Tags>
+    <Tags>powershell msbuild invoke-msbuild PSModule PSIncludes_Cmdlet PSCmdlet_Invoke-MSBuild PSCmdlet_New-BinaryLogger PSCmdlet_New-ConsoleLogger PSCmdlet_New-FileLogger PSCmdlet_New-Logger PSCmdlet_New-StructuredLogger PSCommand_Invoke-MSBuild PSCommand_New-BinaryLogger PSCommand_New-ConsoleLogger PSCommand_New-FileLogger PSCommand_New-Logger PSCommand_New-StructuredLogger</Tags>
     <GenerateSymbolPackage>true</GenerateSymbolPackage>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>

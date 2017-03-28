@@ -18,9 +18,16 @@ namespace PowerBuild
         private static Lazy<Factory> _instance = new Lazy<Factory>(CreateInvokeFactory, LazyThreadSafetyMode.ExecutionAndPublication);
         private static Lazy<AppDomain> _invokeAppDomain = new Lazy<AppDomain>(CreateInvokeAppDomain, LazyThreadSafetyMode.ExecutionAndPublication);
 
+        public static Factory InvokeInstance => _instance.Value;
+
         public static Factory PowerShellInstance { get; } = new Factory();
 
-        public static Factory InvokeInstance => _instance.Value;
+        public ILogger CreateBinaryLogger(BinaryLoggerParameters fileLoggerParameters)
+        {
+            var fileLogger = new BinaryLogger();
+            fileLogger.Parameters = fileLoggerParameters.ToString();
+            return Wrap(fileLogger);
+        }
 
         public ILogger CreateConsoleLogger(ConsoleLoggerParameters consoleLoggerParameters, PSHost host)
         {
