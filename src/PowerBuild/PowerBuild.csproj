@@ -111,6 +111,7 @@
     <Compile Include="ConfigurationArgumentCompleter.cs" />
     <Compile Include="FileUtilities.cs" />
     <Compile Include="InvokeMSBuildArgumentCompleterBase.cs" />
+    <Compile Include="InvokeMSBuildPreprocess.cs" />
     <Compile Include="Logging\BinaryLoggerParameters.cs" />
     <Compile Include="Logging\CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />

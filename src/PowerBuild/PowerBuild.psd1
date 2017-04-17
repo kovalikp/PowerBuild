@@ -77,6 +77,7 @@ FormatsToProcess = @(
 # Cmdlets to export from this module
 CmdletsToExport = @(
     'Invoke-MSBuild',
+    'Invoke-MSBuildPreprocess',
     'New-BinaryLogger',
     'New-ConsoleLogger',
     'New-FileLogger',
@@ -103,7 +104,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('powershell', 'msbuild', 'invoke-msbuild')
+        Tags = @('powershell', 'msbuild', 'invoke-msbuild', 'invoke-msbuildpreprocess')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/kovalikp/PowerBuild/blob/master/LICENSE'

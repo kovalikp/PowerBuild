@@ -29,7 +29,7 @@ namespace PowerBuild
     /// </example>
     [OutputType(typeof(BuildResult))]
     [Alias("msbuild")]
-    [Cmdlet("Invoke", "MSBuild")]
+    [Cmdlet(VerbsLifecycle.Invoke, "MSBuild")]
     public class InvokeMSBuild : PSCmdlet
     {
         private MSBuildHelper _msBuildHelper;
