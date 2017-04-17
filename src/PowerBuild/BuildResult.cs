@@ -7,11 +7,16 @@ namespace PowerBuild
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.Build.Execution;
-    using Microsoft.Build.Framework;
 
     [Serializable]
     public class BuildResult
     {
+        [NonSerialized]
+        private TaskItem[] _items;
+
+        [NonSerialized]
+        private TargetResult[] _targets;
+
         /// <summary>Gets a flag indicating whether a circular dependency was detected.</summary>
         /// <returns>Returns true if a circular dependency was detected; false otherwise.</returns>
         public bool CircularDependency { get; internal set; }
@@ -30,7 +35,7 @@ namespace PowerBuild
 
         /// <summary>Gets an enumerator over all items in this build result set.</summary>
         /// <returns>Returns an enumerator over all items in this build result set.</returns>
-        public IEnumerable<ITaskItem> Items => ResultsByTarget.Values.SelectMany(x => x.Items);
+        public TaskItem[] Items => _items ?? (_items = ResultsByTarget.Values.SelectMany(x => x.Items).Cast<TaskItem>().ToArray());
 
         /// <summary>Gets the build request ID of the originating node.</summary>
         /// <returns>Returns the build request ID of the originating node.</returns>
@@ -44,6 +49,8 @@ namespace PowerBuild
         /// <returns>Returns the global build request ID which issued the request leading to this build result set.</returns>
         public int ParentGlobalRequestId { get; internal set; }
 
+        public string Project { get; internal set; }
+
         /// <summary>Gets an enumerator over all target results in this build result set.</summary>
         /// <returns>Returns an enumerator over all target results in this build result set.</returns>
         public IReadOnlyDictionary<string, TargetResult> ResultsByTarget { get; internal set; }
@@ -54,14 +61,12 @@ namespace PowerBuild
 
         /// <summary>Gets an enumerator over all targets in this build result set.</summary>
         /// <returns>Returns an enumerator over all targets in this build result set.</returns>
-        public IEnumerable<ITargetResult> Targets => ResultsByTarget.Values;
-
-        public string Project { get; internal set; }
+        public TargetResult[] Targets => _targets ?? (_targets = ResultsByTarget.Values.ToArray());
 
         /// <summary>Gets an indexer which can be used to get the build result for the given target.</summary>
         /// <returns>The build result for the indexed target.</returns>
         /// <param name="target">The indexed target.</param>
-        public ITargetResult this[string target] => ResultsByTarget[target];
+        public TargetResult this[string target] => ResultsByTarget[target];
 
         /// <summary>Determines if there are any results for the given target.</summary>
         /// <returns>Returns true if results exist; false otherwise.</returns>

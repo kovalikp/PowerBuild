@@ -117,7 +117,17 @@ namespace PowerBuild
 
         public void CopyMetadataTo(ITaskItem destinationItem) => GetTaskItem().CopyMetadataTo(destinationItem);
 
-        public string GetMetadata(string metadataName) => GetTaskItem().GetMetadata(metadataName);
+        public string GetMetadata(string metadataName)
+        {
+            try
+            {
+                return GetTaskItem().GetMetadata(metadataName);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public void RemoveMetadata(string metadataName)
         {

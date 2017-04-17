@@ -8,7 +8,7 @@ namespace PowerBuild
     using Microsoft.Build.Framework;
 
     [Serializable]
-    public class TargetResult : ITargetResult
+    public class TargetResult
     {
         /// <summary>Gets the exception generated when the target was built.</summary>
         /// <returns>Returns the exception generated when the target was built. Return null if no exception occurred.</returns>
@@ -16,7 +16,7 @@ namespace PowerBuild
 
         /// <summary>Gets the set of build items output by the target. </summary>
         /// <returns>Returns the set of build items output by the target. </returns>
-        public ITaskItem[] Items { get; internal set; }
+        public TaskItem[] Items { get; internal set; }
 
         /// <summary>Gets the name of the target.</summary>
         /// <returns>Returns the name of the target.</returns>
