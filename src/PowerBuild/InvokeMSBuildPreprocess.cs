@@ -22,7 +22,7 @@ namespace PowerBuild
     /// <para type="description">
     /// Creates a single, aggregated project file by inlining all the files that would be imported during a build,
     /// with their boundaries marked. This can be useful for figuring out what files are being imported and from where,
-    /// and what they will contribute to the build. By default the output is written to the output stream. 
+    /// and what they will contribute to the build. By default the output is written to the output stream.
     /// If the path to an output file is provided that will be used instead.
     /// </para>
     /// <example>
