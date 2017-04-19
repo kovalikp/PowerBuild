@@ -14,7 +14,7 @@
     <ProjectReference Include="..\PowerBuild\PowerBuild.csproj">
       <PackageDirectory>root</PackageDirectory>
       <PackageOutputGroups>
-        $(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest;ContentFilesProjectOutputGroup;AppConfigFile
+        $(PackageOutputGroups);XmlDoc2CmdletDoc;UpdateModuleManifest;ContentFilesProjectOutputGroup
       </PackageOutputGroups>
     </ProjectReference>
   </ItemGroup>

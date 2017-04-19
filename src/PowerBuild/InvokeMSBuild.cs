@@ -76,15 +76,13 @@ namespace PowerBuild
         /// Gets or sets number of concurrent processes to build with.
         /// </summary>
         /// <para type="description">
-        /// Specifies the maximum number of concurrent processes to build with.
-        /// </para>
-        /// <para type="description">
-        /// There is a bug in MSBuild 15.1 that causes build to fail if value is set above 1.
+        /// Specifies the maximum number of concurrent processes to build with. If the switch is not used,
+        /// MSBuild will use up to the number of processors on the computer.
         /// </para>
         [Parameter]
         [Alias("m")]
         [ValidateRange(1, int.MaxValue)]
-        public int MaxCpuCount { get; set; } = 1; // Environment.ProcessorCount;
+        public int MaxCpuCount { get; set; } = Environment.ProcessorCount;
 
         /// <summary>
         /// Gets or sets node reuse.

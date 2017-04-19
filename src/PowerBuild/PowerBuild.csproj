@@ -147,13 +147,6 @@
     <Compile Include="TaskItemAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <!--<None Include="PowerBuild.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </None>-->
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -204,7 +197,6 @@
   <Target Name="UpdateModuleManifest" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="$(ModuleManifestPath)">
     <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -command &quot;Update-ModuleManifest -Path '$(ModuleManifestPath)' -ModuleVersion '$(BuildVersionSimple)'&quot;" />
   </Target>
-  <Target Name="AppConfigFile" DependsOnTargets="_CopyAppConfigFile" Returns="$(TargetPath).config" />
   <Import Project="..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\..\packages\Nerdbank.GitVersioning.1.6.25\build\Nerdbank.GitVersioning.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

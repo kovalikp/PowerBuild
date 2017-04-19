@@ -15,18 +15,12 @@ namespace PowerBuild.Tests
         [Fact]
         public async Task ProcessRecord_BuildCrossDomain()
         {
-            Directory.GetCurrentDirectory();
-
             var project = Path.Combine(Environment.CurrentDirectory, "PowerBuild.Tests.targets");
-            var configurationFile = Path.Combine(Directory.GetCurrentDirectory(), Assembly.GetExecutingAssembly().GetName().Name + ".dll.config");
-            var appDomainSetup = new AppDomainSetup
-            {
-                ApplicationBase = Directory.GetCurrentDirectory(),
-                ConfigurationFile = configurationFile
-            };
-            var appDomain = AppDomain.CreateDomain("powerbuild", AppDomain.CurrentDomain.Evidence, appDomainSetup);
 
-            var helper = (MSBuildHelper)appDomain.CreateInstanceAndUnwrap(typeof(MSBuildHelper).Assembly.FullName, typeof(MSBuildHelper).FullName);
+            var invokeAppDomain = Factory.CreateInvokeAppDomain();
+            var invokeFactory = Factory.CreateInvokeFactory(invokeAppDomain);
+
+            var helper = invokeFactory.CreateMSBuildHelper();
 
             var parameters = new InvokeMSBuildParameters
             {
@@ -40,7 +34,7 @@ namespace PowerBuild.Tests
             await MarshalTask.FromAsync(helper.BeginProcessRecord, helper.EndProcessRecord);
 
             helper.StopProcessing();
-            AppDomain.Unload(appDomain);
+            AppDomain.Unload(invokeAppDomain);
         }
 
         [Fact]

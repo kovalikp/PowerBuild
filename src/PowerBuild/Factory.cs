@@ -8,6 +8,7 @@ namespace PowerBuild
     using System.Management.Automation.Host;
     using System.Reflection;
     using System.Threading;
+    using Microsoft.Build.Execution;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
     using Microsoft.Build.Logging.StructuredLogger;
@@ -17,6 +18,19 @@ namespace PowerBuild
     {
         private static Lazy<Factory> _instance = new Lazy<Factory>(CreateInvokeFactory, LazyThreadSafetyMode.ExecutionAndPublication);
         private static Lazy<AppDomain> _invokeAppDomain = new Lazy<AppDomain>(CreateInvokeAppDomain, LazyThreadSafetyMode.ExecutionAndPublication);
+
+        public Factory()
+        {
+        }
+
+        public Factory(string moduleDir)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
+            {
+                var targetAssembly = Path.Combine(moduleDir, new AssemblyName(eventArgs.Name).Name + ".dll");
+                return File.Exists(targetAssembly) ? Assembly.LoadFrom(targetAssembly) : null;
+            };
+        }
 
         public static Factory InvokeInstance => _instance.Value;
 
@@ -90,20 +104,42 @@ namespace PowerBuild
             Environment.CurrentDirectory = path;
         }
 
-        private static AppDomain CreateInvokeAppDomain()
+        internal static AppDomain CreateInvokeAppDomain()
         {
-            var configurationFile = Assembly.GetExecutingAssembly().Location + ".config";
+            var msbuildPath = GetMSBuildPath();
+            var msbuildDir = Path.GetDirectoryName(msbuildPath);
+            var configurationFile = msbuildPath + ".config";
             var appDomainSetup = new AppDomainSetup
             {
-                ApplicationBase = Path.GetDirectoryName(typeof(MSBuildHelper).Assembly.Location),
+                ApplicationBase = msbuildDir,
                 ConfigurationFile = configurationFile
             };
             return AppDomain.CreateDomain("powerbuild", AppDomain.CurrentDomain.Evidence, appDomainSetup);
         }
 
+        internal static Factory CreateInvokeFactory(AppDomain appDomain)
+        {
+            var assemblyFile = Assembly.GetExecutingAssembly().CodeBase;
+            var assemblyDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            return (Factory)_invokeAppDomain.Value.CreateInstanceFromAndUnwrap(
+                assemblyFile,
+                typeof(Factory).FullName,
+                false,
+                BindingFlags.Default,
+                null,
+                new object[] { assemblyDir },
+                null,
+                null);
+        }
+
         private static Factory CreateInvokeFactory()
         {
-            return (Factory)_invokeAppDomain.Value.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Factory).FullName);
+            return CreateInvokeFactory(_invokeAppDomain.Value);
+        }
+
+        private static string GetMSBuildPath()
+        {
+            return new BuildParameters().NodeExeLocation;
         }
 
         private ILogger Wrap(ILogger logger)
