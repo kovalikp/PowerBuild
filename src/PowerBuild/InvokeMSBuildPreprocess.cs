@@ -33,6 +33,8 @@ namespace PowerBuild
     [Cmdlet(VerbsLifecycle.Invoke, "MSBuildPreprocess")]
     public class InvokeMSBuildPreprocess : PSCmdlet
     {
+        private MSBuildHelper _msBuildHelper;
+
         /// <summary>
         /// Gets or sets Configuration property.
         /// </summary>
@@ -113,7 +115,17 @@ namespace PowerBuild
         {
             WriteDebug("Begin processing");
             base.BeginProcessing();
-            Factory.PowerShellInstance.SetCurrentDirectory(SessionState.Path.CurrentFileSystemLocation.Path);
+            Factory.InvokeInstance.SetCurrentDirectory(SessionState.Path.CurrentFileSystemLocation.Path);
+            _msBuildHelper = Factory.InvokeInstance.CreateMSBuildHelper();
+            _msBuildHelper.BeginProcessing();
+        }
+
+        protected override void EndProcessing()
+        {
+            WriteDebug("End processing");
+            _msBuildHelper.EndProcessing();
+            _msBuildHelper = null;
+            base.EndProcessing();
         }
 
         protected override void ProcessRecord()
@@ -128,36 +140,49 @@ namespace PowerBuild
                 : new[] { Project };
             var projectFile = MSBuildApp.ProcessProjectSwitch(projects, IgnoreProjectExtensions, Directory.GetFiles);
 
-            if (FileUtilities.IsSolutionFilename(projectFile))
-            {
-                WriteError(new ErrorRecord(new InvalidOperationException("Preprocessing solution files is not supported."), "PreprocessSolutionNotSupported", ErrorCategory.InvalidOperation, projectFile));
-                return;
-            }
-
             if (!string.IsNullOrEmpty(Configuration))
             {
                 globalProperties[nameof(Configuration)] = Configuration;
             }
 
+            projectFile = Path.GetFullPath(projectFile);
             if (!string.IsNullOrEmpty(Platform))
             {
                 globalProperties[nameof(Platform)] = Platform;
             }
 
+            string outputFile = null;
+            if (!string.IsNullOrEmpty(OutputFile))
+            {
+                outputFile = Path.GetFullPath(Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, OutputFile));
+            }
+
+            if (FileUtilities.IsSolutionFilename(projectFile))
+            {
+                PreprocessSolution(projectFile, globalProperties, ToolsVersion, outputFile);
+            }
+            else
+            {
+                PreprocessProject(projectFile, globalProperties, ToolsVersion, outputFile);
+            }
+        }
+
+        private void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
+        {
             var projectCollection = new ProjectCollection(ToolsetDefinitionLocations.Default);
 
             TextWriter preprocessWriter = null;
             StringBuilder stringBuilder = null;
             try
             {
-                if (string.IsNullOrEmpty(OutputFile))
+                if (string.IsNullOrEmpty(outputFile))
                 {
                     stringBuilder = new StringBuilder();
                     preprocessWriter = new StringWriter(stringBuilder);
                 }
                 else
                 {
-                    preprocessWriter = new StreamWriter(new FileStream(OutputFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan));
+                    preprocessWriter = new StreamWriter(new FileStream(outputFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan));
                 }
 
                 var project = projectCollection.LoadProject(projectFile, globalProperties, ToolsVersion);
@@ -172,6 +197,74 @@ namespace PowerBuild
             finally
             {
                 preprocessWriter?.Dispose();
+            }
+        }
+
+        private void PreprocessSolution(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
+        {
+            var metaproj = projectFile + ".metaproj";
+            var metaprojtmp = metaproj + ".tmp";
+            var metaprojExists = File.Exists(metaproj);
+            var msbuildEmitSolution = Environment.GetEnvironmentVariable("MSBuildEmitSolution");
+
+            try
+            {
+                if (metaprojExists)
+                {
+                    File.Delete(metaproj);
+                }
+
+                Environment.SetEnvironmentVariable("MSBuildEmitSolution", "1");
+
+                _msBuildHelper.Parameters = new InvokeMSBuildParameters
+                {
+                    Project = projectFile,
+                    Verbosity = Microsoft.Build.Framework.LoggerVerbosity.Quiet,
+                    ToolsVersion = ToolsVersion,
+                    Target = new[] { "ValidateProjects" },
+                    MaxCpuCount = 1,
+                    NodeReuse = false,
+                    Properties = globalProperties,
+                    DetailedSummary = false,
+                    WarningsAsErrors = null,
+                    WarningsAsMessages = null
+                };
+
+                var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
+                var results = _msBuildHelper.EndProcessRecord(asyncResult);
+                if (string.IsNullOrEmpty(outputFile))
+                {
+                    WriteObject(File.ReadAllText(metaproj));
+                }
+                else if (projectFile.Equals(outputFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    metaprojExists = true;
+                }
+                else if (metaprojExists)
+                {
+                    File.Copy(metaproj, outputFile);
+                }
+                else
+                {
+                    File.Move(metaproj, outputFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteError(new ErrorRecord(ex, "ProcessRecordError", ErrorCategory.NotSpecified, null));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("MSBuildEmitSolution", msbuildEmitSolution);
+                if (!metaprojExists && File.Exists(metaproj))
+                {
+                    File.Delete(metaproj);
+                }
+
+                if (!metaprojExists && File.Exists(metaprojtmp))
+                {
+                    File.Delete(metaprojtmp);
+                }
             }
         }
     }
