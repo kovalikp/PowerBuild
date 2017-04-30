@@ -121,7 +121,7 @@ namespace PowerBuild
         /// <para type="description">
         /// Overrides the Verbosity setting for this logger. Default verbosity is Detailed.
         /// </para>
-        [Parameter(Position = 0)]
+        [Parameter(Position = 1)]
         public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Detailed;
 
         /// <para type="description">

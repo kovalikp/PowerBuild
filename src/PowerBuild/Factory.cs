@@ -90,6 +90,7 @@ namespace PowerBuild
         public ILogger CreateStructuredLogger(string logFile)
         {
             var logger = new StructuredLogger();
+            logger.Verbosity = LoggerVerbosity.Diagnostic;
             logger.Parameters = logFile;
             return Wrap(logger);
         }
