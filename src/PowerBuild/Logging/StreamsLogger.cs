@@ -11,54 +11,46 @@ namespace PowerBuild.Logging
 
     internal class StreamsLogger : Logger, IPowerShellLogger
     {
-        private readonly Cmdlet _cmdlet;
+        private readonly PSCmdlet _cmdlet;
         private readonly Microsoft.Build.Logging.ConsoleLogger _consoleLogger;
-        private BlockingCollection<Action<Cmdlet>> _buildEvents = new BlockingCollection<Action<Cmdlet>>();
+        private BlockingCollection<Action<Cmdlet>> _buildEvents;
         private IEventSource _eventSource;
 
-        public StreamsLogger(LoggerVerbosity verbosity, Cmdlet cmdlet)
+        public StreamsLogger(LoggerVerbosity verbosity, PSCmdlet cmdlet)
         {
             _cmdlet = cmdlet;
             _consoleLogger = new Microsoft.Build.Logging.ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
+        }
+
+        public string Parameters
+        {
+            get { return _consoleLogger.Parameters; }
+            set { _consoleLogger.Parameters = value; }
+        }
+
+        public LoggerVerbosity Verbosity
+        {
+            get { return _consoleLogger.Verbosity; }
+            set { _consoleLogger.Verbosity = value; }
         }
 
         public override void Initialize(IEventSource eventSource)
         {
             _buildEvents = new BlockingCollection<Action<Cmdlet>>();
             _eventSource = eventSource;
-            _eventSource.MessageRaised += _consoleLogger.MessageHandler;
             _eventSource.ErrorRaised += EventSourceOnErrorRaised;
             _eventSource.WarningRaised += EventSourceOnWarningRaised;
-            _eventSource.BuildStarted += _consoleLogger.BuildStartedHandler;
-            _eventSource.BuildFinished += _consoleLogger.BuildFinishedHandler;
-            _eventSource.ProjectStarted += _consoleLogger.ProjectStartedHandler;
-            _eventSource.ProjectFinished += _consoleLogger.ProjectFinishedHandler;
-            _eventSource.TargetStarted += _consoleLogger.TargetStartedHandler;
-            _eventSource.TargetFinished += _consoleLogger.TargetFinishedHandler;
-            _eventSource.TaskStarted += _consoleLogger.TaskStartedHandler;
-            _eventSource.TaskFinished += _consoleLogger.TaskFinishedHandler;
-            _eventSource.CustomEventRaised += _consoleLogger.CustomEventHandler;
+            _consoleLogger.Initialize(eventSource);
         }
 
         public override void Shutdown()
         {
-            _eventSource.MessageRaised -= _consoleLogger.MessageHandler;
+            _consoleLogger.Shutdown();
+            _buildEvents.CompleteAdding();
             _eventSource.ErrorRaised -= EventSourceOnErrorRaised;
             _eventSource.WarningRaised -= EventSourceOnWarningRaised;
-            _eventSource.BuildStarted -= _consoleLogger.BuildStartedHandler;
-            _eventSource.BuildFinished -= _consoleLogger.BuildFinishedHandler;
-            _eventSource.ProjectStarted -= _consoleLogger.ProjectStartedHandler;
-            _eventSource.ProjectFinished -= _consoleLogger.ProjectFinishedHandler;
-            _eventSource.TargetStarted -= _consoleLogger.TargetStartedHandler;
-            _eventSource.TargetFinished -= _consoleLogger.TargetFinishedHandler;
-            _eventSource.TaskStarted -= _consoleLogger.TaskStartedHandler;
-            _eventSource.TaskFinished -= _consoleLogger.TaskFinishedHandler;
-            _eventSource.CustomEventRaised -= _consoleLogger.CustomEventHandler;
-            _buildEvents.CompleteAdding();
             _eventSource = null;
             _buildEvents = null;
-            _consoleLogger.Shutdown();
-            base.Shutdown();
         }
 
         public void WriteEvents()
