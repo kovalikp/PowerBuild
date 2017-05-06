@@ -12,6 +12,7 @@ namespace PowerBuild
     using System.Management.Automation.Language;
     using System.Text.RegularExpressions;
     using Microsoft.Build.CommandLine;
+    using Microsoft.Build.Shared;
 
     internal abstract class InvokeMSBuildArgumentCompleterBase : IArgumentCompleter
     {

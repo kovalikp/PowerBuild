@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,10 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <Import Project="..\PowerBuild.props" />
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</StartProgram>
     <StartArguments>-noexit -command "&amp;{ import-module .\$(AssemblyName).psd1 -verbose}"</StartArguments>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>$(DefineConstants);FEATURE_OSVERSION</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -89,17 +91,47 @@
     <Compile Include="..\MSbuild\XMake.cs">
       <Link>MSBuild\XMake.cs</Link>
     </Compile>
+    <Compile Include="..\Shared\AssemblyUtilities.cs">
+      <Link>Shared\AssemblyUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BuildEnvironmentHelper.cs">
+      <Link>Shared\BuildEnvironmentHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\ErrorUtilities.cs">
       <Link>Shared\ErrorUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\EscapingUtilities.cs">
+      <Link>Shared\EscapingUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\ExceptionHandling.cs">
+      <Link>Shared\ExceptionHandling.cs</Link>
     </Compile>
     <Compile Include="..\Shared\FileDelegates.cs">
       <Link>Shared\FileDelegates.cs</Link>
     </Compile>
+    <Compile Include="..\Shared\FileUtilities.cs">
+      <Link>Shared\FileUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\FileUtilitiesRegex.cs">
+      <Link>Shared\FileUtilitiesRegex.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\InternalErrorException.cs">
       <Link>Shared\InternalErrorException.cs</Link>
     </Compile>
+    <Compile Include="..\Shared\Modifiers.cs">
+      <Link>Shared\Modifiers.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\NativeMethodsShared.cs">
+      <Link>Shared\NativeMethodsShared.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\OpportunisticIntern.cs">
+      <Link>Shared\OpportunisticIntern.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\ResourceUtilities.cs">
       <Link>Shared\ResourceUtilities.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\StringBuilderCache.cs">
+      <Link>Shared\StringBuilderCache.cs</Link>
     </Compile>
     <Compile Include="..\Shared\Strings.shared.Designer.cs">
       <Link>Shared\Strings.shared.Designer.cs</Link>
@@ -107,9 +139,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.shared.resx</DependentUpon>
     </Compile>
+    <Compile Include="..\Shared\VisualStudioLocationHelper.cs">
+      <Link>Shared\VisualStudioLocationHelper.cs</Link>
+    </Compile>
     <Compile Include="AssemblyResources.cs" />
     <Compile Include="ConfigurationArgumentCompleter.cs" />
-    <Compile Include="FileUtilities.cs" />
     <Compile Include="InvokeMSBuildArgumentCompleterBase.cs" />
     <Compile Include="InvokeMSBuildPreprocess.cs" />
     <Compile Include="Logging\BinaryLoggerParameters.cs" />
@@ -173,12 +207,10 @@
   <ItemGroup>
     <EmbeddedResource Include="..\MSbuild\Strings.resx">
       <Link>MSBuild\Strings.resx</Link>
-      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Shared\Strings.shared.resx">
       <Link>Shared\Strings.shared.resx</Link>
-      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.shared.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

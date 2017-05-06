@@ -4,12 +4,14 @@
 namespace PowerBuild
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Build.Execution;
     using Microsoft.Build.Framework;
+    using Microsoft.Build.Shared;
 
     internal class MSBuildHelper : MarshalByRefObject
     {
@@ -111,6 +113,7 @@ namespace PowerBuild
 
         private BuildResult MapBuildResult(string project, Microsoft.Build.Execution.BuildResult buildResult)
         {
+            var escapedProject = EscapingUtilities.Escape(project);
             return new BuildResult
             {
                 Project = project,
@@ -126,9 +129,19 @@ namespace PowerBuild
                     Name = x.Key,
                     Exception = x.Value.Exception,
                     ResultCode = x.Value.ResultCode,
-                    Items = x.Value.Items.Select(y => new TaskItem(y)).ToArray()
+                    Items = x.Value.Items.Cast<ITaskItem2>().Select(
+                        y => new TaskItem(
+                            y.EvaluatedIncludeEscaped,
+                            escapedProject,
+                            ToGeneric(y.CloneCustomMetadataEscaped())))
+                        .ToArray()
                 }))
             };
+        }
+
+        private Dictionary<string, string> ToGeneric(IDictionary dictionary)
+        {
+            return dictionary.Keys.Cast<object>().ToDictionary(x => x.ToString(), x => dictionary[x].ToString());
         }
     }
 }

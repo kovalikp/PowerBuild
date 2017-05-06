@@ -12,6 +12,7 @@ namespace PowerBuild
     using System.Text;
     using Microsoft.Build.CommandLine;
     using Microsoft.Build.Evaluation;
+    using Microsoft.Build.Shared;
 
     /// <summary>
     /// Use MSBuild to preprocess a project.
