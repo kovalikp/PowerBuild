@@ -45,10 +45,22 @@ namespace PowerBuild
         [ArgumentCompleter(typeof(ConfigurationArgumentCompleter))]
         public string Configuration { get; set; }
 
+        /// <summary>
+        /// Gets or sets console logger to use.
+        /// </summary>
+        /// <para type="description">
+        /// Set console logger to use.
+        /// </para>
         [Parameter]
         [Alias("cl")]
         public ConsoleLoggerType? ConsoleLogger { get; set; }
 
+        /// <summary>
+        /// Gets or sets the console logger parameters.
+        /// </summary>
+        /// <para type="description">
+        /// Parameters to console logger.
+        /// </para>
         [Parameter]
         [Alias("clp")]
         public string ConsoleLoggerParameters { get; set; }

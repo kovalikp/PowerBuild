@@ -8,6 +8,9 @@ namespace PowerBuild
     using System.Linq;
     using Microsoft.Build.Execution;
 
+    /// <summary>
+    /// Overall results for targets and requests.
+    /// </summary>
     [Serializable]
     public class BuildResult
     {
@@ -35,7 +38,7 @@ namespace PowerBuild
 
         /// <summary>Gets an enumerator over all items in this build result set.</summary>
         /// <returns>Returns an enumerator over all items in this build result set.</returns>
-        public TaskItem[] Items => _items ?? (_items = ResultsByTarget.Values.SelectMany(x => x.Items).Cast<TaskItem>().ToArray());
+        public TaskItem[] Items => _items ?? (_items = ResultsByTarget.Values.SelectMany(x => x.Items).ToArray());
 
         /// <summary>Gets the build request ID of the originating node.</summary>
         /// <returns>Returns the build request ID of the originating node.</returns>
@@ -49,6 +52,8 @@ namespace PowerBuild
         /// <returns>Returns the global build request ID which issued the request leading to this build result set.</returns>
         public int ParentGlobalRequestId { get; internal set; }
 
+        /// <summary>Gets the full project path.</summary>
+        /// <returns>The full project path.</returns>
         public string Project { get; internal set; }
 
         /// <summary>Gets an enumerator over all target results in this build result set.</summary>

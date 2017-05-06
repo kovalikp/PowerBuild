@@ -3,10 +3,24 @@
 
 namespace PowerBuild
 {
+    /// <summary>
+    /// Enumeration for ConsoleLogger parameter of Invoke-MSBuild.
+    /// </summary>
     public enum ConsoleLoggerType
     {
+        /// <summary>
+        /// No logger
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Logger writing to PowerShell output streams.
+        /// </summary>
         Streams,
+
+        /// <summary>
+        /// Logger writing to PowerShell host.
+        /// </summary>
         PSHost
     }
 }
