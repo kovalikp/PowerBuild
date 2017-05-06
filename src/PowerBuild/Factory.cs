@@ -5,7 +5,6 @@ namespace PowerBuild
 {
     using System;
     using System.IO;
-    using System.Management.Automation.Host;
     using System.Reflection;
     using System.Threading;
     using Microsoft.Build.Execution;
@@ -16,8 +15,13 @@ namespace PowerBuild
 
     internal class Factory : MarshalByRefObject
     {
-        private static Lazy<Factory> _instance = new Lazy<Factory>(CreateInvokeFactory, LazyThreadSafetyMode.ExecutionAndPublication);
-        private static Lazy<AppDomain> _invokeAppDomain = new Lazy<AppDomain>(CreateInvokeAppDomain, LazyThreadSafetyMode.ExecutionAndPublication);
+        private static Lazy<Factory> _instance = new Lazy<Factory>(
+            CreateInvokeFactory,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+
+        private static Lazy<AppDomain> _invokeAppDomain = new Lazy<AppDomain>(
+            CreateInvokeAppDomain,
+            LazyThreadSafetyMode.ExecutionAndPublication);
 
         public Factory()
         {
@@ -43,11 +47,18 @@ namespace PowerBuild
             return Wrap(fileLogger);
         }
 
-        public ILogger CreateConsoleLogger(ConsoleLoggerParameters consoleLoggerParameters, PSHost host)
+        public ILogger CreateConsoleLogger(ConsoleLoggerParameters consoleLoggerParameters, bool usePSHost)
         {
             var verbosity = consoleLoggerParameters.Verbosity ?? LoggerVerbosity.Normal;
-            var consoleLogger = new Logging.ConsoleLogger(verbosity, host);
-            consoleLogger.Parameters = consoleLoggerParameters.ToString();
+            return CreateConsoleLogger(verbosity, consoleLoggerParameters.ToString(), usePSHost);
+        }
+
+        public ILogger CreateConsoleLogger(LoggerVerbosity verbosity, string parameters, bool usePSHost)
+        {
+            var consoleLogger = usePSHost
+                ? (ILogger)new PSHostLogger(verbosity)
+                : new StreamsLogger(verbosity);
+            consoleLogger.Parameters = parameters;
             return consoleLogger;
         }
 

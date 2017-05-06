@@ -3,10 +3,10 @@
 
 namespace PowerBuild
 {
-    public enum DefaultLoggerType
+    public enum ConsoleLoggerType
     {
         None,
         Streams,
-        Host
+        PSHost
     }
 }

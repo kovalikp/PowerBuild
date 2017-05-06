@@ -4,86 +4,53 @@
 namespace PowerBuild.Logging
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Management.Automation;
     using Microsoft.Build.Framework;
-    using Microsoft.Build.Utilities;
 
-    internal class StreamsLogger : Logger, IPowerShellLogger
+    internal class StreamsLogger : PSLogger
     {
-        private readonly PSCmdlet _cmdlet;
-        private readonly Microsoft.Build.Logging.ConsoleLogger _consoleLogger;
-        private BlockingCollection<Action<Cmdlet>> _buildEvents;
         private IEventSource _eventSource;
 
-        public StreamsLogger(LoggerVerbosity verbosity, PSCmdlet cmdlet)
+        public StreamsLogger(LoggerVerbosity verbosity)
+            : base(verbosity)
         {
-            _cmdlet = cmdlet;
-            _consoleLogger = new Microsoft.Build.Logging.ConsoleLogger(verbosity, WriteHandler, ColorSet, ColorReset);
         }
 
-        public string Parameters
+        public override void Initialize(IEventSource eventSource, int noteCount)
         {
-            get { return _consoleLogger.Parameters; }
-            set { _consoleLogger.Parameters = value; }
-        }
-
-        public LoggerVerbosity Verbosity
-        {
-            get { return _consoleLogger.Verbosity; }
-            set { _consoleLogger.Verbosity = value; }
-        }
-
-        public override void Initialize(IEventSource eventSource)
-        {
-            _buildEvents = new BlockingCollection<Action<Cmdlet>>();
+            base.Initialize(eventSource, noteCount);
             _eventSource = eventSource;
             _eventSource.ErrorRaised += EventSourceOnErrorRaised;
             _eventSource.WarningRaised += EventSourceOnWarningRaised;
-            _consoleLogger.Initialize(eventSource);
         }
 
         public override void Shutdown()
         {
-            _consoleLogger.Shutdown();
-            _buildEvents.CompleteAdding();
             _eventSource.ErrorRaised -= EventSourceOnErrorRaised;
             _eventSource.WarningRaised -= EventSourceOnWarningRaised;
             _eventSource = null;
-            _buildEvents = null;
+            base.Shutdown();
         }
 
-        public void WriteEvents()
+        protected override void Write(string message)
         {
-            foreach (var action in _buildEvents.GetConsumingEnumerable())
-            {
-                action(_cmdlet);
-            }
-        }
-
-        private void ColorReset()
-        {
-        }
-
-        private void ColorSet(ConsoleColor color)
-        {
+            PSEventSink?.WriteVerbose(message);
         }
 
         private void EventSourceOnErrorRaised(object sender, BuildErrorEventArgs e)
         {
-            var errorRecord = new ErrorRecord(new Exception(FormatErrorEvent(e)), $"MSBuildError({e.Code})", ErrorCategory.NotSpecified, e);
-            _buildEvents.Add(cmdlet => _cmdlet.WriteError(errorRecord));
+            var errorRecord = new ErrorRecord(
+                new Exception(FormatErrorEvent(e)),
+                $"MSBuildError({e.Code})",
+                ErrorCategory.NotSpecified,
+                e);
+            PSEventSink?.WriteError(errorRecord);
         }
 
         private void EventSourceOnWarningRaised(object sender, BuildWarningEventArgs e)
         {
             var message = FormatWarningEvent(e);
-            _buildEvents.Add(cmdlet => _cmdlet.WriteWarning(message));
-        }
-
-        private void WriteHandler(string message)
-        {
-            _buildEvents.Add(cmdlet => _cmdlet.WriteVerbose(message));
+            PSEventSink?.WriteWarning(message);
         }
     }
 }

@@ -120,13 +120,16 @@
     <Compile Include="InvokeMSBuildParameters.cs" />
     <Compile Include="Logging\ConsoleLoggerParameters.cs" />
     <Compile Include="Logging\FileLoggerParameters.cs" />
-    <Compile Include="Logging\IPowerShellLogger.cs" />
     <Compile Include="Logging\InvokeDomainLogger.cs" />
+    <Compile Include="Logging\IPSEventSink.cs" />
+    <Compile Include="Logging\IPSLogger.cs" />
     <Compile Include="Logging\LoggerParameters.cs" />
+    <Compile Include="Logging\PSEventSink.cs" />
+    <Compile Include="Logging\PSLogger.cs" />
     <Compile Include="MarshalTask.cs" />
     <Compile Include="MSBuildHelper.cs" />
     <Compile Include="BuildResult.cs" />
-    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\PSHostLogger.cs" />
     <Compile Include="Logging\StreamsLogger.cs" />
     <Compile Include="NewBinaryLogger.cs" />
     <Compile Include="NewStructuredLogger.cs" />
@@ -135,7 +138,7 @@
     <Compile Include="NewLogger.cs" />
     <Compile Include="PlatformArgumentCompleter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DefaultLoggerType.cs" />
+    <Compile Include="ConsoleLoggerType.cs" />
     <Compile Include="ResultsByTargetAdapter.cs" />
     <Compile Include="SolutionTargetResolver.cs" />
     <Compile Include="TargetArgumentCompleter.cs" />

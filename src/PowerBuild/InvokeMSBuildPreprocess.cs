@@ -56,15 +56,6 @@ namespace PowerBuild
         public string[] IgnoreProjectExtensions { get; set; }
 
         /// <summary>
-        /// Gets or sets the output file path.
-        /// </summary>
-        /// <para type="description">
-        /// Path of aggregate project file to write the output to.
-        /// </para>
-        [Parameter(Mandatory = false)]
-        public string OutputFile { get; set; }
-
-        /// <summary>
         /// Gets or sets Platform property.
         /// </summary>
         /// <para type="description">
@@ -151,23 +142,17 @@ namespace PowerBuild
                 globalProperties[nameof(Platform)] = Platform;
             }
 
-            string outputFile = null;
-            if (!string.IsNullOrEmpty(OutputFile))
-            {
-                outputFile = Path.GetFullPath(Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, OutputFile));
-            }
-
             if (FileUtilities.IsSolutionFilename(projectFile))
             {
-                PreprocessSolution(projectFile, globalProperties, ToolsVersion, outputFile);
+                PreprocessSolution(projectFile, globalProperties, ToolsVersion);
             }
             else
             {
-                PreprocessProject(projectFile, globalProperties, ToolsVersion, outputFile);
+                PreprocessProject(projectFile, globalProperties, ToolsVersion);
             }
         }
 
-        private void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
+        private void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion)
         {
             var projectCollection = new ProjectCollection(ToolsetDefinitionLocations.Default);
 
@@ -175,15 +160,8 @@ namespace PowerBuild
             StringBuilder stringBuilder = null;
             try
             {
-                if (string.IsNullOrEmpty(outputFile))
-                {
-                    stringBuilder = new StringBuilder();
-                    preprocessWriter = new StringWriter(stringBuilder);
-                }
-                else
-                {
-                    preprocessWriter = new StreamWriter(new FileStream(outputFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan));
-                }
+                stringBuilder = new StringBuilder();
+                preprocessWriter = new StringWriter(stringBuilder);
 
                 var project = projectCollection.LoadProject(projectFile, globalProperties, ToolsVersion);
                 project.SaveLogicalProject(preprocessWriter);
@@ -200,7 +178,7 @@ namespace PowerBuild
             }
         }
 
-        private void PreprocessSolution(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
+        private void PreprocessSolution(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion)
         {
             var metaproj = projectFile + ".metaproj";
             var metaprojtmp = metaproj + ".tmp";
@@ -232,22 +210,7 @@ namespace PowerBuild
 
                 var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
                 var results = _msBuildHelper.EndProcessRecord(asyncResult);
-                if (string.IsNullOrEmpty(outputFile))
-                {
-                    WriteObject(File.ReadAllText(metaproj));
-                }
-                else if (projectFile.Equals(outputFile, StringComparison.OrdinalIgnoreCase))
-                {
-                    metaprojExists = true;
-                }
-                else if (metaprojExists)
-                {
-                    File.Copy(metaproj, outputFile);
-                }
-                else
-                {
-                    File.Move(metaproj, outputFile);
-                }
+                WriteObject(File.ReadAllText(metaproj));
             }
             catch (Exception ex)
             {

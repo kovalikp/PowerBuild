@@ -5,8 +5,8 @@ namespace PowerBuild.Logging
 {
     using Microsoft.Build.Framework;
 
-    public interface IPowerShellLogger : ILogger
+    public interface IPSLogger : ILogger
     {
-        void WriteEvents();
+        void Initialize(IPSEventSink psEventSink);
     }
 }

@@ -102,13 +102,19 @@ namespace PowerBuild
         /// Overrides the Verbosity setting for this logger. Default verbosity is Normal.
         /// </para>
         [Parameter(Position = 0)]
-        public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
+        public LoggerVerbosity? Verbosity { get; set; }
 
         /// <para type="description">
         /// Show only warnings.
         /// </para>
         [Parameter]
         public SwitchParameter WarningsOnly { get; set; }
+
+        /// <para type="description">
+        /// Log to PowerShell host instead of output streams.
+        /// </para>
+        [Parameter]
+        public SwitchParameter PSHost { get; set; }
 
         protected override void ProcessRecord()
         {
@@ -133,7 +139,7 @@ namespace PowerBuild
                 WarningsOnly = WarningsOnly
             };
 
-            var logger = Factory.PowerShellInstance.CreateConsoleLogger(loggerParameters, Host);
+            var logger = Factory.PowerShellInstance.CreateConsoleLogger(loggerParameters, PSHost.IsPresent);
 
             WriteObject(logger);
         }

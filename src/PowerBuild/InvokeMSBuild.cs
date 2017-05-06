@@ -10,6 +10,7 @@ namespace PowerBuild
     using System.IO;
     using System.Linq;
     using System.Management.Automation;
+    using System.Threading.Tasks;
     using Logging;
     using Microsoft.Build.CommandLine;
     using Microsoft.Build.Framework;
@@ -34,13 +35,23 @@ namespace PowerBuild
     {
         private MSBuildHelper _msBuildHelper;
 
-        [Parameter]
-        [Alias("dl")]
-        public DefaultLoggerType DefaultLogger { get; set; } = DefaultLoggerType.Streams;
+        /// <summary>
+        /// Gets or sets Configuration property.
+        /// </summary>
+        /// <para type="description">
+        /// Set build Configuration property.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        [ArgumentCompleter(typeof(ConfigurationArgumentCompleter))]
+        public string Configuration { get; set; }
 
         [Parameter]
-        [Alias("dlp")]
-        public string DefaultLoggerParameters { get; set; }
+        [Alias("cl")]
+        public ConsoleLoggerType? ConsoleLogger { get; set; }
+
+        [Parameter]
+        [Alias("clp")]
+        public string ConsoleLoggerParameters { get; set; }
 
         /// <summary>
         /// Gets or sets detailed summary parameter.
@@ -93,6 +104,16 @@ namespace PowerBuild
         [Parameter]
         [Alias("nr")]
         public bool? NodeReuse { get; set; } = null;
+
+        /// <summary>
+        /// Gets or sets Platform property.
+        /// </summary>
+        /// <para type="description">
+        /// Set build Platform property.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        [ArgumentCompleter(typeof(PlatformArgumentCompleter))]
+        public string Platform { get; set; }
 
         /// <summary>
         /// Gets or sets project to build.
@@ -172,26 +193,6 @@ namespace PowerBuild
         [Alias("nowarn")]
         public string[] WarningsAsMessages { get; set; }
 
-        /// <summary>
-        /// Gets or sets Configuration property.
-        /// </summary>
-        /// <para type="description">
-        /// Set build Configuration property.
-        /// </para>
-        [Parameter(Mandatory = false)]
-        [ArgumentCompleter(typeof(ConfigurationArgumentCompleter))]
-        public string Configuration { get; set; }
-
-        /// <summary>
-        /// Gets or sets Platform property.
-        /// </summary>
-        /// <para type="description">
-        /// Set build Platform property.
-        /// </para>
-        [Parameter(Mandatory = false)]
-        [ArgumentCompleter(typeof(PlatformArgumentCompleter))]
-        public string Platform { get; set; }
-
         protected override void BeginProcessing()
         {
             WriteDebug("Begin processing");
@@ -241,38 +242,51 @@ namespace PowerBuild
                 NodeReuse = NodeReuse ?? Environment.GetEnvironmentVariable("MSBUILDDISABLENODEREUSE") != "1",
                 Properties = properties,
                 DetailedSummary = DetailedSummary || Verbosity == LoggerVerbosity.Diagnostic,
-                WarningsAsErrors = WarningsAsErrors == null ? null : new HashSet<string>(WarningsAsErrors, StringComparer.InvariantCultureIgnoreCase),
-                WarningsAsMessages = WarningsAsMessages == null ? null : new HashSet<string>(WarningsAsMessages, StringComparer.InvariantCultureIgnoreCase)
+                WarningsAsErrors = WarningsAsErrors == null
+                    ? null
+                    : new HashSet<string>(WarningsAsErrors, StringComparer.InvariantCultureIgnoreCase),
+                WarningsAsMessages = WarningsAsMessages == null
+                    ? null
+                    : new HashSet<string>(WarningsAsMessages, StringComparer.InvariantCultureIgnoreCase)
             };
 
             var loggers = new List<ILogger>();
-            IPowerShellLogger powerShellLogger;
-            switch (DefaultLogger)
-            {
-                case DefaultLoggerType.Streams:
-                    powerShellLogger = new StreamsLogger(Verbosity, this);
-                    break;
-
-                case DefaultLoggerType.Host:
-                    powerShellLogger = new ConsoleLogger(Verbosity, Host);
-                    break;
-
-                case DefaultLoggerType.None:
-                    powerShellLogger = null;
-                    break;
-
-                default:
-                    throw new InvalidEnumArgumentException();
-            }
+            ILogger consoleLogger;
 
             if (Logger != null)
             {
                 loggers.AddRange(Logger);
             }
 
-            if (powerShellLogger != null)
+            var consoleLoggerType = GetConsoleLoggerType();
+
+            switch (consoleLoggerType)
             {
-                loggers.Add(powerShellLogger);
+                case ConsoleLoggerType.Streams:
+                    consoleLogger = Factory.PowerShellInstance.CreateConsoleLogger(Verbosity, ConsoleLoggerParameters, false);
+                    break;
+
+                case ConsoleLoggerType.PSHost:
+                    consoleLogger = Factory.PowerShellInstance.CreateConsoleLogger(Verbosity, ConsoleLoggerParameters, true);
+                    break;
+
+                case ConsoleLoggerType.None:
+                    consoleLogger = null;
+                    break;
+
+                default:
+                    throw new InvalidEnumArgumentException();
+            }
+
+            if (consoleLogger != null)
+            {
+                loggers.Add(consoleLogger);
+            }
+
+            var eventSink = new PSEventSink(this);
+            foreach (var psLogger in loggers.OfType<IPSLogger>())
+            {
+                psLogger.Initialize(eventSink);
             }
 
             var crossDomainLoggers = (
@@ -286,9 +300,9 @@ namespace PowerBuild
 
             try
             {
-                var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
-                powerShellLogger?.WriteEvents();
-                var results = _msBuildHelper.EndProcessRecord(asyncResult);
+                var asyncResults = ProcessRecordAsync(eventSink);
+                eventSink.ConsumeEvents();
+                var results = asyncResults.Result;
                 WriteObject(results, true);
             }
             catch (Exception ex)
@@ -305,9 +319,31 @@ namespace PowerBuild
             base.StopProcessing();
         }
 
+        private ConsoleLoggerType GetConsoleLoggerType()
+        {
+            var hasPSLogger = Logger?.Any(x => x is IPSLogger) ?? false;
+            return hasPSLogger
+                ? ConsoleLogger ?? ConsoleLoggerType.None
+                : ConsoleLogger ?? ConsoleLoggerType.Streams;
+        }
+
         private IEnumerable<ILogger> MakeLoggersCrossDomain(bool isMarshalByRef, IEnumerable<ILogger> loggers)
         {
             return isMarshalByRef ? loggers : new[] { new CrossDomainLogger(loggers) };
+        }
+
+        private async Task<IEnumerable<BuildResult>> ProcessRecordAsync(PSEventSink eventSink)
+        {
+            try
+            {
+                return await MarshalTask.FromAsync(
+                    _msBuildHelper.BeginProcessRecord,
+                    _msBuildHelper.EndProcessRecord);
+            }
+            finally
+            {
+                eventSink.CompleteWriting();
+            }
         }
     }
 }
