@@ -11,7 +11,6 @@ namespace PowerBuild
     using System.Management.Automation;
     using System.Text;
     using Microsoft.Build.CommandLine;
-    using Microsoft.Build.Evaluation;
     using Microsoft.Build.Shared;
 
     /// <summary>
@@ -55,6 +54,15 @@ namespace PowerBuild
         [Parameter]
         [Alias("ignore")]
         public string[] IgnoreProjectExtensions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output file path.
+        /// </summary>
+        /// <para type="description">
+        /// Path of aggregate project file to write the output to.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        public string OutputFile { get; set; }
 
         /// <summary>
         /// Gets or sets Platform property.
@@ -137,36 +145,44 @@ namespace PowerBuild
                 globalProperties[nameof(Configuration)] = Configuration;
             }
 
-            projectFile = Path.GetFullPath(projectFile);
             if (!string.IsNullOrEmpty(Platform))
             {
                 globalProperties[nameof(Platform)] = Platform;
             }
 
+            string outputFile = null;
+            if (!string.IsNullOrEmpty(OutputFile))
+            {
+                outputFile = Path.GetFullPath(Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, OutputFile));
+            }
+
             if (FileUtilities.IsSolutionFilename(projectFile))
             {
-                PreprocessSolution(projectFile, globalProperties, ToolsVersion);
+                PreprocessSolution(projectFile, globalProperties, ToolsVersion, outputFile);
             }
             else
             {
-                PreprocessProject(projectFile, globalProperties, ToolsVersion);
+                PreprocessProject(projectFile, globalProperties, ToolsVersion, outputFile);
             }
         }
 
-        private void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion)
+        private void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
         {
-            var projectCollection = new ProjectCollection(ToolsetDefinitionLocations.Default);
-
             TextWriter preprocessWriter = null;
             StringBuilder stringBuilder = null;
             try
             {
-                stringBuilder = new StringBuilder();
-                preprocessWriter = new StringWriter(stringBuilder);
+                if (string.IsNullOrEmpty(outputFile))
+                {
+                    stringBuilder = new StringBuilder();
+                    preprocessWriter = new StringWriter(stringBuilder);
+                }
+                else
+                {
+                    preprocessWriter = new StreamWriter(new FileStream(outputFile, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan));
+                }
 
-                var project = projectCollection.LoadProject(projectFile, globalProperties, ToolsVersion);
-                project.SaveLogicalProject(preprocessWriter);
-                projectCollection.UnloadProject(project);
+                _msBuildHelper.PreprocessProject(projectFile, globalProperties, toolsVersion, preprocessWriter);
 
                 if (stringBuilder != null)
                 {
@@ -179,57 +195,10 @@ namespace PowerBuild
             }
         }
 
-        private void PreprocessSolution(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion)
+        private void PreprocessSolution(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, string outputFile)
         {
-            var metaproj = projectFile + ".metaproj";
-            var metaprojtmp = metaproj + ".tmp";
-            var metaprojExists = File.Exists(metaproj);
-            var msbuildEmitSolution = Environment.GetEnvironmentVariable("MSBuildEmitSolution");
-
-            try
-            {
-                if (metaprojExists)
-                {
-                    File.Delete(metaproj);
-                }
-
-                Environment.SetEnvironmentVariable("MSBuildEmitSolution", "1");
-
-                _msBuildHelper.Parameters = new InvokeMSBuildParameters
-                {
-                    Project = projectFile,
-                    Verbosity = Microsoft.Build.Framework.LoggerVerbosity.Quiet,
-                    ToolsVersion = ToolsVersion,
-                    Target = new[] { "ValidateProjects" },
-                    MaxCpuCount = 1,
-                    NodeReuse = false,
-                    Properties = globalProperties,
-                    DetailedSummary = false,
-                    WarningsAsErrors = null,
-                    WarningsAsMessages = null
-                };
-
-                var asyncResult = _msBuildHelper.BeginProcessRecord(null, null);
-                var results = _msBuildHelper.EndProcessRecord(asyncResult);
-                WriteObject(File.ReadAllText(metaproj));
-            }
-            catch (Exception ex)
-            {
-                WriteError(new ErrorRecord(ex, "ProcessRecordError", ErrorCategory.NotSpecified, null));
-            }
-            finally
-            {
-                Environment.SetEnvironmentVariable("MSBuildEmitSolution", msbuildEmitSolution);
-                if (!metaprojExists && File.Exists(metaproj))
-                {
-                    File.Delete(metaproj);
-                }
-
-                if (!metaprojExists && File.Exists(metaprojtmp))
-                {
-                    File.Delete(metaprojtmp);
-                }
-            }
+            var tempProjectFile = SolutionHelper.CreateTempMetaproj(projectFile, globalProperties, toolsVersion);
+            PreprocessProject(tempProjectFile, globalProperties, toolsVersion, outputFile);
         }
     }
 }

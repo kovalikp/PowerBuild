@@ -11,32 +11,31 @@ namespace PowerBuild
     {
         protected override IEnumerable<string> GetProjectCompletionResults(InvokeMSBuildParameters parameters)
         {
-            Project project = null;
-            try
-            {
-                project = new Project(parameters.Project, parameters.Properties, parameters.ToolsVersion);
-                return project.Targets.Select(x => x.Key);
-            }
-            catch
-            {
-                return Enumerable.Empty<string>();
-            }
-            finally
-            {
-                if (project != null)
-                {
-                    ProjectCollection.GlobalProjectCollection.UnloadProject(project);
-                }
-            }
+            var msbuildHelper = Factory.InvokeInstance.CreateMSBuildHelper();
+            msbuildHelper.Parameters = parameters;
+            return msbuildHelper.GetTargets();
         }
 
         protected override IEnumerable<string> GetSolutionCompletionResults(InvokeMSBuildParameters parameters)
         {
             try
             {
-                parameters.Properties.TryGetValue(nameof(InvokeMSBuild.Configuration), out string configuration);
-                parameters.Properties.TryGetValue(nameof(InvokeMSBuild.Platform), out string platform);
-                return SolutionTargetResolver.GetSolutionTargets(parameters.Project, configuration, platform);
+                var tempProjectFile = SolutionHelper.CreateTempMetaproj(parameters);
+                var temProjectParameters = new InvokeMSBuildParameters
+                {
+                    DetailedSummary = parameters.DetailedSummary,
+                    MaxCpuCount = parameters.MaxCpuCount,
+                    NodeReuse = parameters.NodeReuse,
+                    Project = tempProjectFile,
+                    Properties = parameters.Properties,
+                    Target = parameters.Target,
+                    ToolsVersion = parameters.ToolsVersion,
+                    Verbosity = parameters.Verbosity,
+                    WarningsAsErrors = parameters.WarningsAsErrors,
+                    WarningsAsMessages = parameters.WarningsAsMessages,
+                };
+
+                return GetProjectCompletionResults(temProjectParameters);
             }
             catch
             {

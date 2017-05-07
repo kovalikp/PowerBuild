@@ -38,7 +38,7 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 | /maxcpucount[:n]							| -MaxCpuCount \<int\>
 | /toolsversion:\<version\>					| -ToolsVersion \<string\>
 | /verbosity:\<level\>						| -Verbosity \<LoggerVerbosity\>
-| /consoleloggerparameters:\<parameters\>	| -ConsoleLoggerParameters
+| /consoleloggerparameters:\<parameters\>	| -ConsoleLoggerParameters \<string[]\>
 | /noconsolelogger							| -ConsoleLogger {None \| Streams \| PSHost}
 | /fileLogger[n]							| New-FileLogger
 | /fileloggerparameters[n]:\<parameters\>	| New-FileLogger
@@ -54,7 +54,7 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 | /ignoreprojectextensions:\<extensions\>	| -IgnoreProjectExtensions \<string[]\>
 | /nodeReuse:\<parameters\>					| -NodeReuse \<bool\> |
 | /preprocess								| Invoke-MSBuildPreprocess
-| /preprocess:file							| Invoke-MSBuildPreprocess \| Out-File
+| /preprocess:file							| Invoke-MSBuildPreprocess -OutputFile \<string[]\>
 | /detailedsummary							| -DetailedSummary |
 | @\<file\>									|
 | /noautoresponse							|
@@ -64,14 +64,14 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 
 ### Argument Completers
 
-PovwrBuild provides autocompleters for several arguments. They either use MSBuild API directly, or try to approximate
+PowerBuild provides autocompleters for several arguments. They either use MSBuild API directly, or try to approximate
 MSBuild functionality to generate values.
 
-| Parameter		| Solution				| Project				|
-|---------------|-------------------	|-----------------------|
-| Target		| Approximate MSBuild	| MSBuild API
-| Configuration | MSBuild API			| "Debug" or "Release"
-| Platform		| MSBuild API			| "AnyCPU", "x64" or "x86"
+| Parameter		| Solution			| Project				|
+|---------------|-------------------|-----------------------|
+| Target		| Metaproject + API	| MSBuild API
+| Configuration | MSBuild API		| "Debug" or "Release"
+| Platform		| MSBuild API		| "AnyCPU", "x64" or "x86"
 
 
 ### Logging

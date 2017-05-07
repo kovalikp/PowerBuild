@@ -174,7 +174,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConsoleLoggerType.cs" />
     <Compile Include="ResultsByTargetAdapter.cs" />
-    <Compile Include="SolutionTargetResolver.cs" />
+    <Compile Include="SolutionHelper.cs" />
     <Compile Include="TargetArgumentCompleter.cs" />
     <Compile Include="TargetResult.cs" />
     <Compile Include="ResultsByTarget.cs" />

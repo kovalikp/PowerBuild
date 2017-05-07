@@ -6,9 +6,11 @@ namespace PowerBuild
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Build.Evaluation;
     using Microsoft.Build.Execution;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Shared;
@@ -45,6 +47,47 @@ namespace PowerBuild
         public IEnumerable<BuildResult> EndProcessRecord(IAsyncResult asyncResult)
         {
             return MarshalTask.GetResult<IEnumerable<BuildResult>>(asyncResult);
+        }
+
+        public IEnumerable<string> GetTargets()
+        {
+            Project project = null;
+            try
+            {
+                var projectFile = FileUtilities.NormalizePath(Parameters.Project);
+                project = new Project(projectFile, Parameters.Properties, Parameters.ToolsVersion);
+                return project.Targets.Select(x => x.Key).ToArray();
+            }
+            catch
+            {
+                return Enumerable.Empty<string>();
+            }
+            finally
+            {
+                if (project != null)
+                {
+                    ProjectCollection.GlobalProjectCollection.UnloadProject(project);
+                }
+            }
+        }
+
+        public void PreprocessProject(string projectFile, IDictionary<string, string> globalProperties, string toolsVersion, TextWriter preprocessWriter)
+        {
+            projectFile = FileUtilities.NormalizePath(projectFile);
+            var projectCollection = new ProjectCollection(ToolsetDefinitionLocations.Default);
+            Project project = null;
+            try
+            {
+                project = projectCollection.LoadProject(projectFile, globalProperties, toolsVersion);
+                project.SaveLogicalProject(preprocessWriter);
+            }
+            finally
+            {
+                if (project != null)
+                {
+                    projectCollection.UnloadProject(project);
+                }
+            }
         }
 
         public async Task<IEnumerable<BuildResult>> ProcessRecordAsync()
