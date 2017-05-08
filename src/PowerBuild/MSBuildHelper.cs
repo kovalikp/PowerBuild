@@ -122,6 +122,7 @@ namespace PowerBuild
                     WarningsAsErrors = Parameters.WarningsAsErrors,
                     WarningsAsMessages = Parameters.WarningsAsMessages,
                     LogTaskInputs = logTaskInputs,
+                    NodeExeLocation = Factory.GetMSBuildPath()
                 };
 
                 _buildManager.BeginBuild(parameters);

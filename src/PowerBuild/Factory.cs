@@ -144,14 +144,27 @@ namespace PowerBuild
                 null);
         }
 
+        internal static string GetMSBuildPath()
+        {
+            var nodeExeLocation = new BuildParameters().NodeExeLocation;
+            if (Environment.Is64BitProcess)
+            {
+                var node64ExeLocation = Path.Combine(
+                    Path.GetDirectoryName(nodeExeLocation),
+                    "amd64",
+                    Path.GetFileName(nodeExeLocation));
+                if (File.Exists(node64ExeLocation))
+                {
+                    return node64ExeLocation;
+                }
+            }
+
+            return nodeExeLocation;
+        }
+
         private static Factory CreateInvokeFactory()
         {
             return CreateInvokeFactory(_invokeAppDomain.Value);
-        }
-
-        private static string GetMSBuildPath()
-        {
-            return new BuildParameters().NodeExeLocation;
         }
 
         private ILogger Wrap(ILogger logger)
