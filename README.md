@@ -38,7 +38,7 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 | /maxcpucount[:n]							| -MaxCpuCount \<int\>
 | /toolsversion:\<version\>					| -ToolsVersion \<string\>
 | /verbosity:\<level\>						| -Verbosity \<LoggerVerbosity\>
-| /consoleloggerparameters:\<parameters\>	| -ConsoleLoggerParameters \<string[]\>
+| /consoleloggerparameters:\<parameters\>	| -ConsoleLoggerParameters \<string\>
 | /noconsolelogger							| -ConsoleLogger {None \| Streams \| PSHost}
 | /fileLogger[n]							| New-FileLogger
 | /fileloggerparameters[n]:\<parameters\>	| New-FileLogger
@@ -54,7 +54,7 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 | /ignoreprojectextensions:\<extensions\>	| -IgnoreProjectExtensions \<string[]\>
 | /nodeReuse:\<parameters\>					| -NodeReuse \<bool\> |
 | /preprocess								| Invoke-MSBuildPreprocess
-| /preprocess:file							| Invoke-MSBuildPreprocess -OutputFile \<string[]\>
+| /preprocess:file							| Invoke-MSBuildPreprocess -OutputFile \<string\>
 | /detailedsummary							| -DetailedSummary |
 | @\<file\>									|
 | /noautoresponse							|
