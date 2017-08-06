@@ -238,6 +238,15 @@ namespace Microsoft.Build.Shared
                 .Where(i => i.Version.Major == v.Major && i.Version.Minor == v.Minor && Directory.Exists(i.Path))
                 .ToList();
 
+            if (instances.Count == 0)
+            {
+                // kovalikp: find next higher version
+                instances = s_getVisualStudioInstances()
+                    .Where(i => i.Version.Major == v.Major && i.Version.Minor > v.Minor && Directory.Exists(i.Path))
+                    .OrderBy(x => x.Version)
+                    .ToList();
+            }
+
             if (instances.Count == 0) return null;
 
             if (instances.Count > 1)

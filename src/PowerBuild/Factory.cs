@@ -11,6 +11,7 @@ namespace PowerBuild
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
     using Microsoft.Build.Logging.StructuredLogger;
+    using Microsoft.Build.Shared;
     using PowerBuild.Logging;
 
     internal class Factory : MarshalByRefObject
@@ -146,20 +147,14 @@ namespace PowerBuild
 
         internal static string GetMSBuildPath()
         {
-            var nodeExeLocation = new BuildParameters().NodeExeLocation;
             if (Environment.Is64BitProcess)
             {
-                var node64ExeLocation = Path.Combine(
-                    Path.GetDirectoryName(nodeExeLocation),
-                    "amd64",
-                    Path.GetFileName(nodeExeLocation));
-                if (File.Exists(node64ExeLocation))
-                {
-                    return node64ExeLocation;
-                }
+                return Path.Combine(BuildEnvironmentHelper.Instance.MSBuildToolsDirectory64, "msbuild.exe");
             }
-
-            return nodeExeLocation;
+            else
+            {
+                return Path.Combine(BuildEnvironmentHelper.Instance.MSBuildToolsDirectory32, "msbuild.exe");
+            }
         }
 
         private static Factory CreateInvokeFactory()
