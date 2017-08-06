@@ -15,6 +15,8 @@ namespace PowerBuild
 
     internal class Factory : MarshalByRefObject
     {
+        private static readonly string DefaultModuleDir;
+        private static readonly string DefaultMSBuildDir;
         private readonly Lazy<AppDomain> _invokeAppDomain;
         private readonly Lazy<Factory> _invokeInstance;
         private string _moduleDir;
@@ -23,19 +25,23 @@ namespace PowerBuild
         static Factory()
         {
             var assemblyFile = Assembly.GetExecutingAssembly().CodeBase;
-            var assemblyDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            DefaultModuleDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            DefaultMSBuildDir = Path.GetDirectoryName(GetMSBuildPath());
+        }
 
-            var msbuildDir = Path.GetDirectoryName(GetMSBuildPath());
-            PowerShellInstance = new Factory(assemblyDir, msbuildDir);
+        public Factory()
+            : this(DefaultModuleDir, DefaultMSBuildDir)
+        {
         }
 
         public Factory(string moduleDir, string msbuildDir)
         {
+            _moduleDir = moduleDir ?? throw new ArgumentNullException(nameof(moduleDir));
+            _msbuildDir = msbuildDir ?? throw new ArgumentNullException(nameof(msbuildDir));
+
             _invokeInstance = new Lazy<Factory>(CreateInvokeFactory, LazyThreadSafetyMode.ExecutionAndPublication);
             _invokeAppDomain = new Lazy<AppDomain>(CreateInvokeAppDomain, LazyThreadSafetyMode.ExecutionAndPublication);
 
-            _moduleDir = moduleDir;
-            _msbuildDir = msbuildDir;
             AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
             {
                 var targetAssembly = Path.Combine(moduleDir, new AssemblyName(eventArgs.Name).Name + ".dll");
