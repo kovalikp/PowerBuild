@@ -27,6 +27,7 @@ namespace PowerBuild
             var assemblyFile = Assembly.GetExecutingAssembly().CodeBase;
             DefaultModuleDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             DefaultMSBuildDir = Path.GetDirectoryName(GetMSBuildPath());
+            PowerShellInstance = new Factory();
         }
 
         public Factory()
@@ -44,13 +45,13 @@ namespace PowerBuild
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, eventArgs) =>
             {
-                var targetAssembly = Path.Combine(moduleDir, new AssemblyName(eventArgs.Name).Name + ".dll");
+                var targetAssembly = Path.Combine(msbuildDir, new AssemblyName(eventArgs.Name).Name + ".dll");
                 if (File.Exists(targetAssembly))
                 {
                     return Assembly.LoadFrom(targetAssembly);
                 }
 
-                targetAssembly = Path.Combine(msbuildDir, new AssemblyName(eventArgs.Name).Name + ".dll");
+                targetAssembly = Path.Combine(moduleDir, new AssemblyName(eventArgs.Name).Name + ".dll");
                 if (File.Exists(targetAssembly))
                 {
                     return Assembly.LoadFrom(targetAssembly);
