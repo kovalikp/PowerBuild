@@ -39,12 +39,14 @@ PS> $buildResults | Select-Object -ExpandProperty Items | Format-Table ItemSpec,
 | /toolsversion:\<version\>					| -ToolsVersion \<string\>
 | /verbosity:\<level\>						| -Verbosity \<LoggerVerbosity\>
 | /consoleloggerparameters:\<parameters\>	| -ConsoleLoggerParameters \<string\>
-| /noconsolelogger							| -ConsoleLogger {None \| Streams \| PSHost}
+| /noconsolelogger							| -ConsoleLogger {None \| PSStreams \| PSHost}
 | /fileLogger[n]							| New-FileLogger
 | /fileloggerparameters[n]:\<parameters\>	| New-FileLogger
 | /distributedlogger						|
 | /distributedFileLogger					|
 | /logger:\<logger\>						| -Logger \<ILogger[]\>
+| /binaryLogger								| New-BinaryLogger
+| /binaryLogger:\<parameters\>				| New-BinaryLogger
 | /warnaserror								| -WarningsAsErrors @()
 | /warnaserror:code[;code2]					| -WarningsAsErrors \<string[]\>
 | /warnasmessage							| -WarningsAsMessages @()
@@ -77,14 +79,14 @@ MSBuild functionality to generate values.
 ### Logging
 
 Default logger can be specified using `-ConsoleLogger` parameter. The parameter currently recognized these values.
- - $nulll - If console logger was passed via -Logger parameter, then `None`, else `Streams`.
- - Streams - Uses Error, Warning and Verbose streams to write logs. `-Verbosity` switch affects log level output to Verbose stream.
+ - $null - If console logger was passed via -Logger parameter, then `None`, else `PSStreams`.
+ - PSStreams - Uses Error, Warning and Verbose streams to write logs. `-Verbosity` switch affects log level output to Verbose stream.
  - PSHost - Uses PowerShell host to write logs. This is equivalent of msbuild.exe's console logger.
  - None - Disables console logger.
  
 Level of logging is affected by `-Verbose` parameter.
 
-Additional loggers can be created using `New-Logger`, `New-ConsoleLogger` or `New-FileLogger` commnandlets and passed to `-Logger` parameter.
+Additional loggers can be created using `New-Logger`, `New-ConsoleLogger`, `New-FileLogger`, `New-BinaryLogger` or `New-StructuredLogger` commnandlets and passed to `-Logger` parameter.
 
 ### Example
 
