@@ -122,7 +122,7 @@ namespace Microsoft.Build.Shared
 
         private static BuildEnvironment TryFromEnvironmentVariable()
         {
-            var msBuildExePath = Environment.GetEnvironmentVariable("MSBUILD_EXE_PATH");
+            var msBuildExePath = s_getEnvironmentVariable("MSBUILD_EXE_PATH");
 
             return TryFromStandaloneMSBuildExe(msBuildExePath);
         }
@@ -217,8 +217,8 @@ namespace Microsoft.Build.Shared
         private static BuildEnvironment TryFromDevConsole()
         {
             // VSINSTALLDIR and VisualStudioVersion are set from the Developer Command Prompt.
-            var vsInstallDir = Environment.GetEnvironmentVariable("VSINSTALLDIR");
-            var vsVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+            var vsInstallDir = s_getEnvironmentVariable("VSINSTALLDIR");
+            var vsVersion = s_getEnvironmentVariable("VisualStudioVersion");
 
             if (string.IsNullOrEmpty(vsInstallDir) || string.IsNullOrEmpty(vsVersion) ||
                 vsVersion != CurrentVisualStudioVersion || !Directory.Exists(vsInstallDir)) return null;
@@ -237,15 +237,6 @@ namespace Microsoft.Build.Shared
             var instances = s_getVisualStudioInstances()
                 .Where(i => i.Version.Major == v.Major && i.Version.Minor == v.Minor && Directory.Exists(i.Path))
                 .ToList();
-
-            if (instances.Count == 0)
-            {
-                // kovalikp: find next higher version
-                instances = s_getVisualStudioInstances()
-                    .Where(i => i.Version.Major == v.Major && i.Version.Minor > v.Minor && Directory.Exists(i.Path))
-                    .OrderBy(x => x.Version)
-                    .ToList();
-            }
 
             if (instances.Count == 0) return null;
 
@@ -365,18 +356,25 @@ namespace Microsoft.Build.Shared
 #endif
         }
 
+        private static string GetEnvironmentVariable(string variable)
+        {
+            return Environment.GetEnvironmentVariable(variable);
+        }
+
         /// <summary>
         /// Resets the current singleton instance (for testing).
         /// </summary>
         internal static void ResetInstance_ForUnitTestsOnly(Func<string> getProcessFromRunningProcess = null,
             Func<string> getExecutingAssemblyPath = null, Func<string> getAppContextBaseDirectory = null,
-            Func<IEnumerable<VisualStudioInstance>> getVisualStudioInstances = null)
+            Func<IEnumerable<VisualStudioInstance>> getVisualStudioInstances = null,
+            Func<string, string> getEnvironmentVariable = null)
         {
             s_getProcessFromRunningProcess = getProcessFromRunningProcess ?? GetProcessFromRunningProcess;
             s_getExecutingAssemblyPath = getExecutingAssemblyPath ?? GetExecutingAssemblyPath;
             s_getAppContextBaseDirectory = getAppContextBaseDirectory ?? GetAppContextBaseDirectory;
             s_getVisualStudioInstances = getVisualStudioInstances ?? VisualStudioLocationHelper.GetInstances;
-            
+            s_getEnvironmentVariable = getEnvironmentVariable ?? GetEnvironmentVariable;
+
             BuildEnvironmentHelperSingleton.s_instance = Initialize();
         }
 
@@ -384,6 +382,7 @@ namespace Microsoft.Build.Shared
         private static Func<string> s_getExecutingAssemblyPath = GetExecutingAssemblyPath;
         private static Func<string> s_getAppContextBaseDirectory = GetAppContextBaseDirectory;
         private static Func<IEnumerable<VisualStudioInstance>> s_getVisualStudioInstances = VisualStudioLocationHelper.GetInstances;
+        private static Func<string, string> s_getEnvironmentVariable = GetEnvironmentVariable;
 
 
         private static class BuildEnvironmentHelperSingleton
@@ -427,15 +426,15 @@ namespace Microsoft.Build.Shared
     /// </summary>
     internal class BuildEnvironment
     {
-        public BuildEnvironment(BuildEnvironmentMode mode, string currrentMSBuildExePath, bool runningTests, bool runningInVisualStudio, string visualStudioPath)
+        public BuildEnvironment(BuildEnvironmentMode mode, string currentMSBuildExePath, bool runningTests, bool runningInVisualStudio, string visualStudioPath)
         {
             Mode = mode;
             RunningTests = runningTests;
             RunningInVisualStudio = runningInVisualStudio;
 
-            CurrentMSBuildExePath = currrentMSBuildExePath;
-            CurrentMSBuildToolsDirectory = Path.GetDirectoryName(currrentMSBuildExePath);
-            CurrentMSBuildConfigurationFile = string.Concat(currrentMSBuildExePath, ".config");
+            CurrentMSBuildExePath = currentMSBuildExePath;
+            CurrentMSBuildToolsDirectory = Path.GetDirectoryName(currentMSBuildExePath);
+            CurrentMSBuildConfigurationFile = string.Concat(currentMSBuildExePath, ".config");
 
             VisualStudioInstallRootDirectory = visualStudioPath;
 

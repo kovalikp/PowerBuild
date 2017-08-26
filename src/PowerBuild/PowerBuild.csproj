@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;FEATURE_VISUALSTUDIOSETUP</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;FEATURE_VISUALSTUDIOSETUP;STANDALONEBUILD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;FEATURE_VISUALSTUDIOSETUP</DefineConstants>
+    <DefineConstants>TRACE;FEATURE_VISUALSTUDIOSETUP;STANDALONEBUILD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -102,6 +102,9 @@
     <Compile Include="..\Shared\BuildEnvironmentHelper.cs">
       <Link>Shared\BuildEnvironmentHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Shared\Constants.cs">
+      <Link>Shared\Constants.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\ErrorUtilities.cs">
       <Link>Shared\ErrorUtilities.cs</Link>
     </Compile>
@@ -143,6 +146,9 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.shared.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Shared\Traits.cs">
+      <Link>Shared\Traits.cs</Link>
     </Compile>
     <Compile Include="..\Shared\VisualStudioLocationHelper.cs">
       <Link>Shared\VisualStudioLocationHelper.cs</Link>

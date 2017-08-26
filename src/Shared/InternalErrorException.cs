@@ -19,11 +19,6 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Build.Shared
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-
     /// <summary>
     /// This exception is to be thrown whenever an assumption we have made in the code turns out to be false. Thus, if this
     /// exception ever gets thrown, it is because of a bug in our own code, not because of something the user or project author

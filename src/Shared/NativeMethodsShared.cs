@@ -20,6 +20,7 @@ using System.Reflection;
 using Microsoft.Win32.SafeHandles;
 
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
+using Microsoft.Build.Utilities;
 
 namespace Microsoft.Build.Shared
 {
@@ -92,7 +93,7 @@ namespace Microsoft.Build.Shared
             ProcessLdtInformation,
             ProcessLdtSize,
             ProcessDefaultHardErrorMode,
-            ProcessIoPortHandlers, // Note: this is kernel mode only 
+            ProcessIoPortHandlers, // Note: this is kernel mode only
             ProcessPooledUsageAndLimits,
             ProcessWorkingSetWatch,
             ProcessUserModeIOPL,
@@ -238,13 +239,13 @@ namespace Microsoft.Build.Shared
             }
 
             /// <summary>
-            /// Size of the structure, in bytes. You must set this member before calling GlobalMemoryStatusEx. 
+            /// Size of the structure, in bytes. You must set this member before calling GlobalMemoryStatusEx.
             /// </summary>
             private uint _length;
 
             /// <summary>
-            /// Number between 0 and 100 that specifies the approximate percentage of physical 
-            /// memory that is in use (0 indicates no memory use and 100 indicates full memory use). 
+            /// Number between 0 and 100 that specifies the approximate percentage of physical
+            /// memory that is in use (0 indicates no memory use and 100 indicates full memory use).
             /// </summary>
             public uint MemoryLoad;
 
@@ -254,35 +255,35 @@ namespace Microsoft.Build.Shared
             public ulong TotalPhysical;
 
             /// <summary>
-            /// Size of physical memory available, in bytes. 
+            /// Size of physical memory available, in bytes.
             /// </summary>
             public ulong AvailablePhysical;
 
             /// <summary>
-            /// Size of the committed memory limit, in bytes. This is physical memory plus the 
-            /// size of the page file, minus a small overhead. 
+            /// Size of the committed memory limit, in bytes. This is physical memory plus the
+            /// size of the page file, minus a small overhead.
             /// </summary>
             public ulong TotalPageFile;
 
             /// <summary>
-            /// Size of available memory to commit, in bytes. The limit is ullTotalPageFile. 
+            /// Size of available memory to commit, in bytes. The limit is ullTotalPageFile.
             /// </summary>
             public ulong AvailablePageFile;
 
             /// <summary>
-            /// Total size of the user mode portion of the virtual address space of the calling process, in bytes. 
+            /// Total size of the user mode portion of the virtual address space of the calling process, in bytes.
             /// </summary>
             public ulong TotalVirtual;
 
             /// <summary>
-            /// Size of unreserved and uncommitted memory in the user mode portion of the virtual 
-            /// address space of the calling process, in bytes. 
+            /// Size of unreserved and uncommitted memory in the user mode portion of the virtual
+            /// address space of the calling process, in bytes.
             /// </summary>
             public ulong AvailableVirtual;
 
             /// <summary>
-            /// Size of unreserved and uncommitted memory in the extended portion of the virtual 
-            /// address space of the calling process, in bytes. 
+            /// Size of unreserved and uncommitted memory in the extended portion of the virtual
+            /// address space of the calling process, in bytes.
             /// </summary>
             public ulong AvailableExtendedVirtual;
         }
@@ -353,7 +354,7 @@ namespace Microsoft.Build.Shared
             public readonly ProcessorArchitectures ProcessorArchitectureType;
 
             /// <summary>
-            /// Actual architecture of the the system.
+            /// Actual architecture of the system.
             /// </summary>
             public readonly ProcessorArchitectures ProcessorArchitectureTypeNative;
 
@@ -478,15 +479,15 @@ namespace Microsoft.Build.Shared
                 var env = Environment.OSVersion.Platform;
                 return env == PlatformID.MacOSX || env == PlatformID.Unix;
 #else
-                return IsUnix || IsOSX;
+                return IsLinux || IsOSX;
 #endif
             }
         }
 
         /// <summary>
-        /// Gets a flag indicating if we are running under a Unix system (Mac is not included)
+        /// Gets a flag indicating if we are running under Linux
         /// </summary>
-        internal static bool IsUnix
+        internal static bool IsLinux
         {
             get
             {
@@ -576,7 +577,7 @@ namespace Microsoft.Build.Shared
         /// </summary>
         internal static string GetOSNameForExtensionsPath()
         {
-            return IsOSX ? "osx" : (IsUnix ? "unix" : "windows");
+            return IsOSX ? "osx" : (IsLinux ? "unix" : "windows");
         }
 
         /// <summary>
@@ -727,7 +728,7 @@ namespace Microsoft.Build.Shared
         /// <param name="fileModifiedTimeUtc">The UTC last write time for the directory</param>
         internal static bool GetLastWriteDirectoryUtcTime(string fullPath, out DateTime fileModifiedTimeUtc)
         {
-            // This code was copied from the reference mananger, if there is a bug fix in that code, see if the same fix should also be made
+            // This code was copied from the reference manager, if there is a bug fix in that code, see if the same fix should also be made
             // there
 
             fileModifiedTimeUtc = DateTime.MinValue;
@@ -855,54 +856,85 @@ namespace Microsoft.Build.Shared
             return null;
         }
 
-        private static readonly bool UseSymlinkTimeInsteadOfTargetTime = Environment.GetEnvironmentVariable("MSBUILDUSESYMLINKTIMESTAMP") == "1";
-
         /// <summary>
-        /// Get the last write time of the fullpath to the file. 
-        /// If the file does not exist, then DateTime.MinValue is returned
+        /// Get the last write time of the fullpath to the file.
         /// </summary>
         /// <param name="fullPath">Full path to the file in the filesystem</param>
-        /// <returns></returns>
+        /// <returns>The last write time of the file, or DateTime.MinValue if the file does not exist.</returns>
+        /// <remarks>
+        /// This method should be accurate for regular files and symlinks, but can report incorrect data
+        /// if the file's content was modified by writing to it through a different link, unless
+        /// MSBUILDALWAYSCHECKCONTENTTIMESTAMP=1.
+        /// </remarks>
         internal static DateTime GetLastWriteFileUtcTime(string fullPath)
         {
             DateTime fileModifiedTime = DateTime.MinValue;
+
             if (IsWindows)
             {
-                if (UseSymlinkTimeInsteadOfTargetTime)
+                if (Traits.Instance.EscapeHatches.AlwaysUseContentTimestamp)
                 {
-                    WIN32_FILE_ATTRIBUTE_DATA data = new WIN32_FILE_ATTRIBUTE_DATA();
-                    bool success = false;
-
-                    success = NativeMethodsShared.GetFileAttributesEx(fullPath, 0, ref data);
-                    if (success)
-                    {
-                        long dt = ((long) (data.ftLastWriteTimeHigh) << 32) | ((long) data.ftLastWriteTimeLow);
-                        fileModifiedTime = DateTime.FromFileTimeUtc(dt);
-                    }
+                    return GetContentLastWriteFileUtcTime(fullPath);
                 }
-                else
+
+                WIN32_FILE_ATTRIBUTE_DATA data = new WIN32_FILE_ATTRIBUTE_DATA();
+                bool success = false;
+
+                success = NativeMethodsShared.GetFileAttributesEx(fullPath, 0, ref data);
+
+                if (success)
                 {
-                    using (SafeFileHandle handle =
-                        CreateFile(fullPath, GENERIC_READ, FILE_SHARE_READ, IntPtr.Zero, OPEN_EXISTING,
-                            FILE_ATTRIBUTE_NORMAL, IntPtr.Zero))
+                    long dt = ((long)(data.ftLastWriteTimeHigh) << 32) | ((long)data.ftLastWriteTimeLow);
+                    fileModifiedTime = DateTime.FromFileTimeUtc(dt);
+
+                    // If file is a symlink _and_ we're not instructed to do the wrong thing, get a more accurate timestamp. 
+                    if ((data.fileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) == FILE_ATTRIBUTE_REPARSE_POINT && !Traits.Instance.EscapeHatches.UseSymlinkTimeInsteadOfTargetTime)
                     {
-                        if (!handle.IsInvalid)
-                        {
-                            FILETIME ftCreationTime, ftLastAccessTime, ftLastWriteTime;
-                            if (!GetFileTime(handle, out ftCreationTime, out ftLastAccessTime, out ftLastWriteTime) != true)
-                            {
-                                long fileTime = ((long) (uint) ftLastWriteTime.dwHighDateTime) << 32 |
-                                                (long) (uint) ftLastWriteTime.dwLowDateTime;
-                                fileModifiedTime =
-                                    DateTime.FromFileTimeUtc(fileTime);
-                            }
-                        }
+                        fileModifiedTime = GetContentLastWriteFileUtcTime(fullPath);
                     }
                 }
             }
             else if (File.Exists(fullPath))
             {
                 fileModifiedTime = File.GetLastWriteTimeUtc(fullPath);
+            }
+
+            return fileModifiedTime;
+        }
+
+        /// <summary>
+        /// Get the last write time of the content pointed to by a file path.
+        /// </summary>
+        /// <param name="fullPath">Full path to the file in the filesystem</param>
+        /// <returns>The last write time of the file, or DateTime.MinValue if the file does not exist.</returns>
+        /// <remarks>
+        /// This is the most accurate timestamp-extraction mechanism, but it is too slow to use all the time.
+        /// See https://github.com/Microsoft/msbuild/issues/2052.
+        /// </remarks>
+        private static DateTime GetContentLastWriteFileUtcTime(string fullPath)
+        {
+            DateTime fileModifiedTime = DateTime.MinValue;
+
+            using (SafeFileHandle handle =
+                CreateFile(fullPath,
+                    GENERIC_READ,
+                    FILE_SHARE_READ,
+                    IntPtr.Zero,
+                    OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL, /* No FILE_FLAG_OPEN_REPARSE_POINT; read through to content */
+                    IntPtr.Zero))
+            {
+                if (!handle.IsInvalid)
+                {
+                    FILETIME ftCreationTime, ftLastAccessTime, ftLastWriteTime;
+                    if (!GetFileTime(handle, out ftCreationTime, out ftLastAccessTime, out ftLastWriteTime) != true)
+                    {
+                        long fileTime = ((long)(uint)ftLastWriteTime.dwHighDateTime) << 32 |
+                                        (long)(uint)ftLastWriteTime.dwLowDateTime;
+                        fileModifiedTime =
+                            DateTime.FromFileTimeUtc(fileTime);
+                    }
+                }
             }
 
             return fileModifiedTime;
@@ -925,14 +957,14 @@ namespace Microsoft.Build.Shared
         }
 
         /// <summary>
-        /// Given an error code, converts it to an HRESULT and throws the appropriate exception. 
+        /// Given an error code, converts it to an HRESULT and throws the appropriate exception.
         /// </summary>
         /// <param name="errorCode"></param>
         public static void ThrowExceptionForErrorCode(int errorCode)
         {
             // See ndp\clr\src\bcl\system\io\__error.cs for this code as it appears in the CLR.
 
-            // Something really bad went wrong witht the call
+            // Something really bad went wrong with the call
             // translate the error into an exception
 
             // Convert the errorcode into an HRESULT (See MakeHRFromErrorCode in Win32Native.cs in
@@ -944,77 +976,11 @@ namespace Microsoft.Build.Shared
         }
 
         /// <summary>
-        /// Looks for the given file in the system path i.e. all locations in
-        /// the %PATH% environment variable.
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns>The location of the file, or null if file not found.</returns>
-        internal static string FindOnPath(string filename)
-        {
-            if (IsWindows)
-            {
-                StringBuilder pathBuilder = new StringBuilder(MAX_PATH + 1);
-                string pathToFile = null;
-
-                // we may need to make two attempts because there's a small chance
-                // the buffer may not be sized correctly the first time
-                for (int i = 0; i < 2; i++)
-                {
-                    uint result = SearchPath
-                                    (
-                                        null /* search the system path */,
-                                        filename /* look for this file */,
-                                        null /* don't add an extra extension to the filename when searching */,
-                                        pathBuilder.Capacity /* size of buffer */,
-                                        pathBuilder /* buffer to write path into */,
-                                        null /* don't want pointer to filename in the return path */
-                                    );
-
-                    // if the buffer is not big enough
-                    if (result > pathBuilder.Capacity)
-                    {
-                        ErrorUtilities.VerifyThrow(i == 0, "We should not have to resize the buffer twice.");
-
-                        // resize the buffer and try again
-                        pathBuilder.Capacity = (int)result;
-                    }
-                    else if (result > 0)
-                    {
-                        // file was found, so don't make another attempt
-                        pathToFile = pathBuilder.ToString();
-                        break;
-                    }
-                    else
-                    {
-                        // file was not found, so quit
-                        break;
-                    }
-                }
-                return pathToFile;
-            }
-            else
-            {
-                // Get path from the environment and split on colons
-                var paths = Environment.GetEnvironmentVariable("PATH").Split(':');
-                foreach (var path in paths)
-                {
-                    string filePath = Path.Combine(path, filename);
-                    if (!string.IsNullOrEmpty(path) && File.Exists(filePath))
-                    {
-                        return filePath;
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Kills the specified process by id and all of its children recursively.
         /// </summary>
         internal static void KillTree(int processIdToKill)
         {
-            // Note that GetProcessById does *NOT* internally hold on to the process handle. 
+            // Note that GetProcessById does *NOT* internally hold on to the process handle.
             // Only when you create the process using the Process object
             // does the Process object retain the original handle.
 
@@ -1025,8 +991,8 @@ namespace Microsoft.Build.Shared
             }
             catch (ArgumentException)
             {
-                // The process has already died for some reason.  So shrug and assume that any child processes 
-                // have all also either died or are in the process of doing so. 
+                // The process has already died for some reason.  So shrug and assume that any child processes
+                // have all also either died or are in the process of doing so.
                 return;
             }
 
@@ -1035,7 +1001,7 @@ namespace Microsoft.Build.Shared
                 DateTime myStartTime = thisProcess.StartTime;
 
                 // Grab the process handle.  We want to keep this open for the duration of the function so that
-                // it cannot be reused while we are running. 
+                // it cannot be reused while we are running.
                 SafeProcessHandle hProcess = OpenProcess(eDesiredAccess.PROCESS_QUERY_INFORMATION, false, processIdToKill);
                 if (hProcess.IsInvalid)
                 {
@@ -1051,8 +1017,8 @@ namespace Microsoft.Build.Shared
                     }
                     catch (Win32Exception e)
                     {
-                        // Access denied is potentially expected -- it happens when the process that 
-                        // we're attempting to kill is already dead.  So just ignore in that case. 
+                        // Access denied is potentially expected -- it happens when the process that
+                        // we're attempting to kill is already dead.  So just ignore in that case.
                         if (e.NativeErrorCode != ERROR_ACCESS_DENIED)
                         {
                             throw;
@@ -1185,7 +1151,7 @@ namespace Microsoft.Build.Shared
                             {
                                 if (parentProcessId == childParentProcessId)
                                 {
-                                    // Add this one 
+                                    // Add this one
                                     myChildren.Add(new KeyValuePair<int, SafeProcessHandle>(possibleChildProcess.Id, childHandle));
                                     keepHandle = true;
                                 }
@@ -1227,9 +1193,9 @@ namespace Microsoft.Build.Shared
         #region PInvoke
 
         /// <summary>
-        /// Gets the current OEM code page which is used by console apps 
+        /// Gets the current OEM code page which is used by console apps
         /// (as opposed to the Windows/ANSI code page used by the normal people)
-        /// Basically for each ANSI code page (set in Regional settings) there's a corresponding OEM code page 
+        /// Basically for each ANSI code page (set in Regional settings) there's a corresponding OEM code page
         /// that needs to be used for instance when writing to batch files
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Justification = "Class name is NativeMethodsShared for increased clarity")]
