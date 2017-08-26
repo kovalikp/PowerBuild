@@ -14,6 +14,7 @@ namespace PowerBuild
     using Microsoft.Build.Execution;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Shared;
+    using PowerBuild.Logging;
 
     internal class MSBuildHelper : MarshalByRefObject
     {
@@ -21,9 +22,11 @@ namespace PowerBuild
 
         private CancellationTokenSource _processingCancellationTokenSource;
 
-        public IEnumerable<ILogger> Loggers { get; set; } = Enumerable.Empty<ILogger>();
+        public IEnumerable<LoggerDescription> Loggers { get; set; } = Enumerable.Empty<LoggerDescription>();
 
         public InvokeMSBuildParameters Parameters { get; set; }
+
+        public PSEventSink PSEventSink { get; set; }
 
         public void BeginProcessing()
         {
@@ -112,9 +115,16 @@ namespace PowerBuild
                     }
                 }
 
+                var loggers = Loggers.Select(x => x.CreateLogger(Parameters.Verbosity)).ToList();
+
+                foreach (var psLogger in loggers.OfType<IPSLogger>())
+                {
+                    psLogger.Initialize(PSEventSink);
+                }
+
                 var parameters = new BuildParameters
                 {
-                    Loggers = Loggers,
+                    Loggers = loggers,
                     MaxNodeCount = Parameters.MaxCpuCount,
                     DetailedSummary = Parameters.DetailedSummary,
                     DefaultToolsVersion = Parameters.ToolsVersion,

@@ -3,6 +3,7 @@
 
 namespace PowerBuild
 {
+    using System;
     using System.Management.Automation;
     using Microsoft.Build.Framework;
     using PowerBuild.Logging;
@@ -11,12 +12,16 @@ namespace PowerBuild
     /// Create new binary file logger.
     /// </para>
     /// <para type="description">
-    /// Create new configured binary file logger.
+    /// A logger that serializes all incoming BuildEventArgs in a compressed binary file (*.binlog). The file
+    /// can later be played back and piped into other loggers (file, console, etc) to reconstruct the log contents
+    /// as if a real build was happening. Additionally, this format can be read by tools for
+    /// analysis or visualization. Since the file format preserves structure, tools don't have to parse
+    /// text logs that erase a lot of useful information.
     /// </para>
     /// <example>
     ///   <code>New-BinaryLogger msbuild.binlog</code>
     /// </example>
-    [OutputType(typeof(ILogger))]
+    [OutputType(typeof(LoggerDescription))]
     [Cmdlet(VerbsCommon.New, "BinaryLogger")]
     public class NewBinaryLogger : PSCmdlet
     {
@@ -27,6 +32,14 @@ namespace PowerBuild
         [ValidateNotNullOrEmpty]
         public string LogFile { get; set; } = "msbuild.binlog";
 
+        /// <para type="description">
+        /// Describes whether to collect the project files (including imported project files) used during the build.
+        /// If the project files are collected they can be embedded in the log file or as a separate zip archive.
+        /// </para>
+        [Parameter(Mandatory = false)]
+        [ValidateSet("None", "Embed", "ZipFile", IgnoreCase = true)]
+        public string ProjectImports { get; set; } = "Embed";
+
         /// <summary>
         /// Processes the record.
         /// </summary>
@@ -34,14 +47,15 @@ namespace PowerBuild
         {
             base.ProcessRecord();
 
-            var loggerParameters = new BinaryLoggerParameters()
+            var loggerParameters = new LoggerDescription
             {
-                LogFile = LogFile
+                ClassName = "Microsoft.Build.Logging.BinaryLogger",
+                Parameters = $"{nameof(ProjectImports)}={ProjectImports};{LogFile}",
+                Assembly = Factory.MSBuildVersion < new Version(15, 3) ? "StructuredLogger" : "Microsoft.Build",
+                Verbosity = LoggerVerbosity.Diagnostic
             };
 
-            var logger = Factory.InvokeInstance.CreateBinaryLogger(loggerParameters);
-
-            WriteObject(logger);
+            WriteObject(loggerParameters);
         }
     }
 }

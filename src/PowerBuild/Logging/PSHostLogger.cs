@@ -7,11 +7,6 @@ namespace PowerBuild.Logging
 
     public class PSHostLogger : PSLogger
     {
-        public PSHostLogger(LoggerVerbosity verbosity)
-            : base(verbosity)
-        {
-        }
-
         protected override void Write(string message)
         {
             PSEventSink?.WriteHost(message);

@@ -16,10 +16,14 @@ namespace PowerBuild
     /// <example>
     ///   <code>New-FileLogger build.log -Verbosity Normal -PerformanceSummary</code>
     /// </example>
-    [OutputType(typeof(ILogger))]
+    [OutputType(typeof(LoggerDescription))]
     [Cmdlet(VerbsCommon.New, "FileLogger")]
     public class NewFileLogger : PSCmdlet
     {
+        private static readonly string Assembly = "Microsoft.Build";
+
+        private static readonly string ClassName = "Microsoft.Build.Logging.FileLogger";
+
         /// <summary>
         /// </summary>
         /// <para type="description">
@@ -73,8 +77,9 @@ namespace PowerBuild
         /// <para type="description">
         /// Path to the log file into which the build log will be written.
         /// </para>
-        [Parameter(Position = 0, Mandatory = true)]
-        public string LogFile { get; set; }
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty]
+        public string LogFile { get; set; } = "msbuild.log";
 
         /// <para type="description">
         /// Don't show list of items and properties at the start of each project build.
@@ -159,7 +164,13 @@ namespace PowerBuild
                 WarningsOnly = WarningsOnly
             };
 
-            var logger = Factory.InvokeInstance.CreateFileLogger(loggerParameters);
+            var logger = new LoggerDescription
+            {
+                Assembly = Assembly,
+                ClassName = ClassName,
+                Parameters = loggerParameters.ToString(),
+                Verbosity = Verbosity
+            };
 
             WriteObject(logger);
         }

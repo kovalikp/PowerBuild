@@ -12,9 +12,9 @@ namespace PowerBuild.Logging
     {
         private readonly ConsoleLogger _consoleLogger;
 
-        public PSLogger(LoggerVerbosity verbosity)
+        public PSLogger()
         {
-            _consoleLogger = new ConsoleLogger(verbosity, Write, ColorSet, ColorReset);
+            _consoleLogger = new ConsoleLogger(LoggerVerbosity.Normal, Write, ColorSet, ColorReset);
         }
 
         public override string Parameters

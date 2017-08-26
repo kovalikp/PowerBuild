@@ -16,7 +16,7 @@ namespace PowerBuild
     /// <example>
     ///   <code>New-Logger -ClassName FileLogger -Assembly Microsoft.Build.Engine -Parameters &quot;LogFile=MyLog.log;Append;Verbosity=diagnostic;Encoding=UTF-8&quot;</code>
     /// </example>
-    [OutputType(typeof(ILogger))]
+    [OutputType(typeof(LoggerDescription))]
     [Cmdlet(VerbsCommon.New, "Logger")]
     public class NewLogger : PSCmdlet
     {
@@ -48,7 +48,7 @@ namespace PowerBuild
         {
             base.ProcessRecord();
 
-            var loggerParameters = new LoggerParameters
+            var loggerParameters = new LoggerDescription
             {
                 Assembly = Assembly,
                 ClassName = ClassName,
@@ -56,9 +56,7 @@ namespace PowerBuild
                 Verbosity = Verbosity
             };
 
-            var logger = Factory.InvokeInstance.CreateLogger(loggerParameters);
-
-            WriteObject(logger);
+            WriteObject(loggerParameters);
         }
     }
 }

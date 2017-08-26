@@ -62,8 +62,8 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.11.2290\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="StructuredLogger, Version=1.0.130.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Build.Logging.StructuredLogger.1.0.130\lib\net46\StructuredLogger.dll</HintPath>
+    <Reference Include="StructuredLogger, Version=1.1.168.0, Culture=neutral, PublicKeyToken=d4c7181801cb6448, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Build.Logging.StructuredLogger.1.1.168\lib\net46\StructuredLogger.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -152,24 +152,22 @@
     <Compile Include="InvokeMSBuildArgumentCompleterBase.cs" />
     <Compile Include="InvokeMSBuildPreprocess.cs" />
     <Compile Include="Logging\BinaryLoggerParameters.cs" />
-    <Compile Include="Logging\CrossDomainLogger.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="InvokeMSBuild.cs" />
     <Compile Include="InvokeMSBuildParameters.cs" />
     <Compile Include="Logging\ConsoleLoggerParameters.cs" />
     <Compile Include="Logging\FileLoggerParameters.cs" />
-    <Compile Include="Logging\InvokeDomainLogger.cs" />
     <Compile Include="Logging\IPSEventSink.cs" />
     <Compile Include="Logging\IPSLogger.cs" />
-    <Compile Include="Logging\LoggerParameters.cs" />
+    <Compile Include="Logging\LoggerDescription.cs" />
     <Compile Include="Logging\PSEventSink.cs" />
     <Compile Include="Logging\PSLogger.cs" />
     <Compile Include="MarshalTask.cs" />
     <Compile Include="MSBuildHelper.cs" />
     <Compile Include="BuildResult.cs" />
     <Compile Include="Logging\PSHostLogger.cs" />
-    <Compile Include="Logging\StreamsLogger.cs" />
+    <Compile Include="Logging\PSStreamsLogger.cs" />
     <Compile Include="NewBinaryLogger.cs" />
     <Compile Include="NewStructuredLogger.cs" />
     <Compile Include="NewConsoleLogger.cs" />

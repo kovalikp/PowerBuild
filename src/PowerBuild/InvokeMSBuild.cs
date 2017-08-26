@@ -93,7 +93,7 @@ namespace PowerBuild
         /// </para>
         [Parameter]
         [Alias("l")]
-        public ILogger[] Logger { get; set; }
+        public LoggerDescription[] Logger { get; set; }
 
         /// <summary>
         /// Gets or sets number of concurrent processes to build with.
@@ -262,8 +262,8 @@ namespace PowerBuild
                     : new HashSet<string>(WarningsAsMessages, StringComparer.InvariantCultureIgnoreCase)
             };
 
-            var loggers = new List<ILogger>();
-            ILogger consoleLogger;
+            var loggers = new List<LoggerDescription>();
+            LoggerDescription consoleLogger;
 
             if (Logger != null)
             {
@@ -274,12 +274,24 @@ namespace PowerBuild
 
             switch (consoleLoggerType)
             {
-                case ConsoleLoggerType.Streams:
-                    consoleLogger = Factory.PowerShellInstance.CreateConsoleLogger(Verbosity, ConsoleLoggerParameters, false);
+                case ConsoleLoggerType.PSStreams:
+                    consoleLogger = new LoggerDescription
+                    {
+                        Assembly = NewConsoleLogger.Assembly,
+                        ClassName = NewConsoleLogger.PSStreamsLoggerClassName,
+                        Parameters = ConsoleLoggerParameters,
+                        Verbosity = Verbosity
+                    };
                     break;
 
                 case ConsoleLoggerType.PSHost:
-                    consoleLogger = Factory.PowerShellInstance.CreateConsoleLogger(Verbosity, ConsoleLoggerParameters, true);
+                    consoleLogger = new LoggerDescription
+                    {
+                        Assembly = NewConsoleLogger.Assembly,
+                        ClassName = NewConsoleLogger.PSHostLoggerClassName,
+                        Parameters = ConsoleLoggerParameters,
+                        Verbosity = Verbosity
+                    };
                     break;
 
                 case ConsoleLoggerType.None:
@@ -295,20 +307,8 @@ namespace PowerBuild
                 loggers.Add(consoleLogger);
             }
 
-            var eventSink = new PSEventSink(this);
-            foreach (var psLogger in loggers.OfType<IPSLogger>())
-            {
-                psLogger.Initialize(eventSink);
-            }
-
-            var crossDomainLoggers = (
-                from unknownLogger in loggers
-                group unknownLogger by unknownLogger is MarshalByRefObject
-                into marshalByRefLogger
-                from logger in MakeLoggersCrossDomain(marshalByRefLogger.Key, marshalByRefLogger)
-                select logger).ToArray();
-
-            _msBuildHelper.Loggers = crossDomainLoggers;
+            var eventSink = _msBuildHelper.PSEventSink = new PSEventSink(this);
+            _msBuildHelper.Loggers = loggers;
 
             try
             {
@@ -333,15 +333,9 @@ namespace PowerBuild
 
         private ConsoleLoggerType GetConsoleLoggerType()
         {
-            var hasPSLogger = Logger?.Any(x => x is IPSLogger) ?? false;
-            return hasPSLogger
-                ? ConsoleLogger ?? ConsoleLoggerType.None
-                : ConsoleLogger ?? ConsoleLoggerType.Streams;
-        }
+            var hasPSLogger = Logger?.Any(NewConsoleLogger.IsPSLogger) ?? false;
 
-        private IEnumerable<ILogger> MakeLoggersCrossDomain(bool isMarshalByRef, IEnumerable<ILogger> loggers)
-        {
-            return isMarshalByRef ? loggers : new[] { new CrossDomainLogger(loggers) };
+            return ConsoleLogger ?? (hasPSLogger ? ConsoleLoggerType.None : ConsoleLoggerType.PSStreams);
         }
 
         private async Task<IEnumerable<BuildResult>> ProcessRecordAsync(PSEventSink eventSink)

@@ -7,14 +7,9 @@ namespace PowerBuild.Logging
     using System.Management.Automation;
     using Microsoft.Build.Framework;
 
-    internal class StreamsLogger : PSLogger
+    public class PSStreamsLogger : PSLogger
     {
         private IEventSource _eventSource;
-
-        public StreamsLogger(LoggerVerbosity verbosity)
-            : base(verbosity)
-        {
-        }
 
         public override void Initialize(IEventSource eventSource, int noteCount)
         {

@@ -16,7 +16,7 @@ namespace PowerBuild
         /// <summary>
         /// Logger writing to PowerShell output streams.
         /// </summary>
-        Streams,
+        PSStreams,
 
         /// <summary>
         /// Logger writing to PowerShell host.

@@ -4,28 +4,34 @@
 namespace PowerBuild
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Threading;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Logging;
-    using Microsoft.Build.Logging.StructuredLogger;
     using Microsoft.Build.Shared;
     using PowerBuild.Logging;
 
     internal class Factory : MarshalByRefObject
     {
         private static readonly string DefaultModuleDir;
+
         private static readonly string DefaultMSBuildDir;
+
         private readonly Lazy<AppDomain> _invokeAppDomain;
+
         private readonly Lazy<Factory> _invokeInstance;
+
         private string _moduleDir;
+
         private string _msbuildDir;
 
         static Factory()
         {
             var assemblyFile = Assembly.GetExecutingAssembly().CodeBase;
             DefaultModuleDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            MSBuildVersion = GetMSBuildVersion();
             DefaultMSBuildDir = Path.GetDirectoryName(GetMSBuildPath());
             PowerShellInstance = new Factory();
         }
@@ -63,72 +69,24 @@ namespace PowerBuild
 
         public static Factory InvokeInstance => PowerShellInstance._invokeInstance.Value;
 
+        public static Version MSBuildVersion { get; }
+
         public static Factory PowerShellInstance { get; }
 
         public ILogger CreateBinaryLogger(BinaryLoggerParameters fileLoggerParameters)
         {
-            var fileLogger = new BinaryLogger();
-            fileLogger.Parameters = fileLoggerParameters.ToString();
-            return Wrap(fileLogger);
-        }
+            var binaryLoggerType = Assembly.GetAssembly(typeof(ConsoleLogger)).GetType("Microsoft.Build.Logging.BinaryLogger", false, true);
+            var binaryLogger = binaryLoggerType == null
+                ? (ILogger)Activator.CreateInstance(binaryLoggerType)
+                : new BinaryLogger();
 
-        public ILogger CreateConsoleLogger(ConsoleLoggerParameters consoleLoggerParameters, bool usePSHost)
-        {
-            var verbosity = consoleLoggerParameters.Verbosity ?? LoggerVerbosity.Normal;
-            return CreateConsoleLogger(verbosity, consoleLoggerParameters.ToString(), usePSHost);
-        }
-
-        public ILogger CreateConsoleLogger(LoggerVerbosity verbosity, string parameters, bool usePSHost)
-        {
-            var consoleLogger = usePSHost
-                ? (ILogger)new PSHostLogger(verbosity)
-                : new StreamsLogger(verbosity);
-            consoleLogger.Parameters = parameters;
-            return consoleLogger;
-        }
-
-        public ILogger CreateFileLogger(FileLoggerParameters fileLoggerParameters)
-        {
-            var fileLogger = new FileLogger();
-            fileLogger.Parameters = fileLoggerParameters.ToString();
-            return Wrap(fileLogger);
-        }
-
-        public ILogger CreateLogger(LoggerParameters loggerParameters)
-        {
-            string assemblyName = null;
-            string assemblyFile = null;
-            if (File.Exists(loggerParameters.Assembly))
-            {
-                assemblyFile = loggerParameters.Assembly;
-            }
-            else
-            {
-                assemblyName = loggerParameters.Assembly;
-            }
-
-            var loggerDescription = new LoggerDescription(
-                loggerParameters.ClassName,
-                assemblyName,
-                assemblyFile,
-                loggerParameters.Parameters,
-                loggerParameters.Verbosity);
-
-            var logger = loggerDescription.CreateLogger();
-            return Wrap(logger);
+            binaryLogger.Parameters = fileLoggerParameters.ToString();
+            return binaryLogger;
         }
 
         public MSBuildHelper CreateMSBuildHelper()
         {
             return new MSBuildHelper();
-        }
-
-        public ILogger CreateStructuredLogger(string logFile)
-        {
-            var logger = new StructuredLogger();
-            logger.Verbosity = LoggerVerbosity.Diagnostic;
-            logger.Parameters = logFile;
-            return Wrap(logger);
         }
 
         public override object InitializeLifetimeService()
@@ -189,19 +147,27 @@ namespace PowerBuild
             return Path.GetDirectoryName(GetMSBuildPath());
         }
 
+        private static Version GetMSBuildVersion()
+        {
+            try
+            {
+                var msbuildPath = GetMSBuildPath();
+                var fileVersion = FileVersionInfo.GetVersionInfo(msbuildPath);
+                return new Version(
+                    fileVersion.FileMajorPart,
+                    fileVersion.FileMinorPart,
+                    fileVersion.FileBuildPart,
+                    fileVersion.FilePrivatePart);
+            }
+            catch
+            {
+                return new Version(0, 0);
+            }
+        }
+
         private Factory CreateInvokeFactory()
         {
             return CreateInvokeFactory(_invokeAppDomain.Value);
-        }
-
-        private ILogger Wrap(ILogger logger)
-        {
-            if (logger is MarshalByRefObject)
-            {
-                return logger;
-            }
-
-            return new InvokeDomainLogger(logger);
         }
     }
 }

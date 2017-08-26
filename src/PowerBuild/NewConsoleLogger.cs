@@ -3,6 +3,7 @@
 
 namespace PowerBuild
 {
+    using System;
     using System.Management.Automation;
     using Logging;
     using Microsoft.Build.Framework;
@@ -16,10 +17,16 @@ namespace PowerBuild
     /// <example>
     ///   <code>New-ConsoleLogger -Verbosity Minimal -PerformanceSummary</code>
     /// </example>
-    [OutputType(typeof(ILogger))]
+    [OutputType(typeof(LoggerDescription))]
     [Cmdlet(VerbsCommon.New, "ConsoleLogger")]
     public class NewConsoleLogger : PSCmdlet
     {
+        internal static readonly string Assembly = typeof(PSLogger).Assembly.FullName;
+
+        internal static readonly string PSHostLoggerClassName = typeof(PSHostLogger).FullName;
+
+        internal static readonly string PSStreamsLoggerClassName = typeof(PSStreamsLogger).FullName;
+
         /// <para type="description">
         /// Use the default console colors for all logging messages.
         /// </para>
@@ -75,6 +82,12 @@ namespace PowerBuild
         public SwitchParameter PerformanceSummary { get; set; }
 
         /// <para type="description">
+        /// Log to PowerShell host instead of output streams.
+        /// </para>
+        [Parameter]
+        public SwitchParameter PSHost { get; set; }
+
+        /// <para type="description">
         /// Show TaskCommandLineEvent messages.
         /// </para>
         [Parameter]
@@ -110,11 +123,18 @@ namespace PowerBuild
         [Parameter]
         public SwitchParameter WarningsOnly { get; set; }
 
-        /// <para type="description">
-        /// Log to PowerShell host instead of output streams.
-        /// </para>
-        [Parameter]
-        public SwitchParameter PSHost { get; set; }
+        internal static bool IsPSLogger(LoggerDescription loggerParameters)
+        {
+            var comparision = StringComparison.OrdinalIgnoreCase;
+            var classMatch =
+                typeof(PSHostLogger).FullName.Equals(loggerParameters.ClassName, comparision)
+                || typeof(PSStreamsLogger).FullName.Equals(loggerParameters.ClassName, comparision)
+                || typeof(PSHostLogger).Name.Equals(loggerParameters.ClassName, comparision)
+                || typeof(PSStreamsLogger).Name.Equals(loggerParameters.ClassName, comparision);
+            var assemblyMach = typeof(PSLogger).Assembly.FullName.Equals(loggerParameters.Assembly, comparision);
+
+            return assemblyMach && classMatch;
+        }
 
         protected override void ProcessRecord()
         {
@@ -139,7 +159,13 @@ namespace PowerBuild
                 WarningsOnly = WarningsOnly
             };
 
-            var logger = Factory.PowerShellInstance.CreateConsoleLogger(loggerParameters, PSHost.IsPresent);
+            var logger = new LoggerDescription
+            {
+                Assembly = Assembly,
+                ClassName = PSHost.IsPresent ? PSHostLoggerClassName : PSStreamsLoggerClassName,
+                Parameters = loggerParameters.ToString(),
+                Verbosity = Verbosity
+            };
 
             WriteObject(logger);
         }

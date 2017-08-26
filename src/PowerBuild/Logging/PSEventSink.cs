@@ -7,7 +7,7 @@ namespace PowerBuild.Logging
     using System.Collections.Concurrent;
     using System.Management.Automation;
 
-    internal class PSEventSink : IPSEventSink
+    internal class PSEventSink : MarshalByRefObject, IPSEventSink
     {
         private readonly BlockingCollection<object> _eventActions = new BlockingCollection<object>();
         private ConsoleColor _backgroundColor;
